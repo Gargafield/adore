@@ -93,7 +93,6 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
     std::string bytecode = Luau::compile(*source, copts());
     
     adore::runBytecode(runtime, bytecode, chunkname, GL, program_argc, program_argv);
-    std::cout << "Starting runtime loop" << std::endl;
     std::mutex m;
     std::condition_variable cv;
     bool updateCompleted = false;
@@ -103,9 +102,7 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
 
     while (!quit) {
         windowCreated = windowCreated || IsWindowReady();
-        std::cout << "Runtime loop iteration" << std::endl;
         if (windowCreated) {
-            std::cout << "Frame Start" << std::endl;
             if (WindowShouldClose()) {
                 break;
             }
@@ -138,15 +135,12 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
                 cv.notify_all();
             });
         } else if (!runtime.hasWork()) {
-            std::cout << "No more work, quitting." << std::endl;
             quit = true;
             continue;
         }
 
         if (runtime.hasWork()) {
-            std::cout << "Running runtime step" << std::endl;
             auto step = runtime.runOnce();
-            std::cout << "Runtime step completed" << std::endl;
 
             if (auto err = Luau::get_if<StepErr>(&step))
             {
@@ -160,14 +154,12 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
 
                 // ensure we exit the process with error code properly
                 if (!runtime.hasWork()) {
-                    std::cout << "Error and no more work, quitting." << std::endl;
                     quit = true;
                     result = false;
                     continue;
                 }
             }
         } else {
-            std::cout << "No work to do this frame." << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
@@ -179,7 +171,6 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
             }
             lock.unlock();
             EndDrawing();
-            std::cout << "Frame End" << std::endl;
         }
     }
 
