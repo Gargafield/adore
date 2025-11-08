@@ -93,9 +93,6 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
     std::string bytecode = Luau::compile(*source, copts());
     
     adore::runBytecode(runtime, bytecode, chunkname, GL, program_argc, program_argv);
-    std::mutex m;
-    std::condition_variable cv;
-    bool updateCompleted = false;
     bool quit = false;
     bool result = true;
     bool windowCreated = false;
@@ -107,32 +104,43 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
                 break;
             }
 
-            updateCompleted = false;
-            float dt = GetFrameTime();
-            BeginDrawing();
-
-            runtime.runInWorkQueue([&runtime, &m, &cv, &updateCompleted, &dt]() {
-                std::unique_lock<std::mutex> lock(m);
+            runtime.schedule([&runtime]() {
                 lua_State* L = runtime.globalState.get();
+
+                // remember and reserve stack space so we don't violate call frame limits
+                int base = lua_gettop(L);
+                lua_checkstack(L, 8);
+
                 lua_getglobal(L, "_WINDOW");
                 if (lua_istable(L, -1)) {
-                    lua_getfield(L, -1, "draw");
+                    lua_getfield(L, -1, "update");
                     if (lua_isfunction(L, -1)) {
                         // push delta time
+                        float dt = GetFrameTime();
                         lua_pushnumber(L, dt);
                         if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-                            const char* err = lua_tostring(L, -1);
-                            std::cerr << "Error in window.update: " << (err ? err : "unknown error") << std::endl;
+                            runtime.reportError(L);
                             lua_pop(L, 1);
                         }
                     } else {
                         lua_pop(L, 1);
                     }
+
+                    lua_getfield(L, -1, "draw");
+                    if (lua_isfunction(L, -1)) {
+                        BeginDrawing();
+                        if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+                            runtime.reportError(L);
+                            lua_pop(L, 1);
+                        }
+                        EndDrawing();
+                    } else {
+                        lua_pop(L, 1);
+                    }
                 }
-                lua_pop(L, 1);
-                updateCompleted = true;
-                lock.unlock();
-                cv.notify_all();
+
+                // restore stack to its original state to avoid leaving extra items on the stack
+                lua_settop(L, base);
             });
         } else if (!runtime.hasWork()) {
             quit = true;
@@ -161,16 +169,6 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
             }
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-
-
-        if (windowCreated) {
-            std::unique_lock<std::mutex> lock(m);
-            if (!updateCompleted) {
-                cv.wait(lock);
-            }
-            lock.unlock();
-            EndDrawing();
         }
     }
 

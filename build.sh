@@ -1,7 +1,6 @@
 
 set -xe
 
-
 os_type="$(uname)"
 BUILD_ROOT=""
 EXE_PATH=adore/cli/adore

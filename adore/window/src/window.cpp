@@ -5,12 +5,38 @@
 
 namespace window {
 
+static bool initialized = false;
+
+#define WINDOW_NOT_INITIALIZED_CHECK() \
+    if (!initialized) { \
+        luaL_errorL(L, "Window not initialized"); \
+    }
+
 int init(lua_State* L) {
+    if (initialized) { \
+        luaL_errorL(L, "Window already initialized"); \
+    }
+    initialized = true;
+
     int width = luaL_checkinteger(L, 1);
     int height = luaL_checkinteger(L, 2);
     const char* title = luaL_checkstring(L, 3);
     InitWindow(width, height, title);
     return 0;
+}
+
+int setfps(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    int fps = luaL_checkinteger(L, 1);
+    SetTargetFPS(fps);
+    return 0;
+}
+
+int getfps(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    int fps = GetFPS();
+    lua_pushinteger(L, fps);
+    return 1;
 }
 
 int noop(lua_State* L) {
@@ -24,7 +50,7 @@ int noop(lua_State* L) {
 static int window_newindex(lua_State* L) {
     // Make users able to overwrite update() and draw() functions
     const char* key = luaL_checkstring(L, 2);
-    if (strcmp(key, "draw") == 0) {
+    if (strcmp(key, "draw") == 0 || strcmp(key, "update") == 0) {
         // Check that the value being set is a function
         luaL_checktype(L, 3, LUA_TFUNCTION);
         lua_setreadonly(L, 1, false);
