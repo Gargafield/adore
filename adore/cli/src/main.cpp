@@ -14,6 +14,10 @@
 #include "adore/window.h"
 #include "adore/graphics.h"
 
+#ifdef ADORE_BLACKMAGIC
+#include "adore/blackmagic.h"
+#endif
+
 namespace adore {
 
 
@@ -243,7 +247,9 @@ void setupLuaState(lua_State* L) {
 	std::vector<std::pair<const char*, lua_CFunction>> libs = {{
         {"@adore/window", adoreopen_window},
         {"@adore/graphics", adoreopen_graphics},
-
+#ifdef ADORE_BLACKMAGIC
+        {"@adore/blackmagic", adoreopen_blackmagic},
+#endif
     }};
 
     for (const auto& [name, func] : libs)
