@@ -1,12 +1,11 @@
 #include "adore/graphics.h"
+
+#include "adore/color.h"
 #include <memory>
 #include "raylib.h"
 #include <iostream>
 
 namespace graphics {
-
-static Color CURRENT_COLOR = WHITE;
-static int FONT_SIZE = 20;
 
 int rectangle(lua_State* L) {
     const char* mode = luaL_checkstring(L, 1);
@@ -14,11 +13,12 @@ int rectangle(lua_State* L) {
     int y = luaL_checkinteger(L, 3);
     int width = luaL_checkinteger(L, 4);
     int height = luaL_checkinteger(L, 5);
+    Color color = color::check_color(L, 6);
 
     if (strcmp(mode, "fill") == 0) {
-        DrawRectangle(x, y, width, height, CURRENT_COLOR);
+        DrawRectangle(x, y, width, height, color);
     } else if (strcmp(mode, "line") == 0) {
-        DrawRectangleLines(x, y, width, height, CURRENT_COLOR);
+        DrawRectangleLines(x, y, width, height, color);
     } else {
         luaL_error(L, "Invalid mode for rectangle: %s", mode);
     }
@@ -31,55 +31,15 @@ int circle(lua_State* L) {
     int x = luaL_checkinteger(L, 2);
     int y = luaL_checkinteger(L, 3);
     int radius = luaL_checkinteger(L, 4);
+    Color color = color::check_color(L, 5);
 
     if (strcmp(mode, "fill") == 0) {
-        DrawCircle(x, y, radius, CURRENT_COLOR);
+        DrawCircle(x, y, radius, color);
     } else if (strcmp(mode, "line") == 0) {
-        DrawCircleLines(x, y, radius, CURRENT_COLOR);
+        DrawCircleLines(x, y, radius, color);
     } else {
         luaL_error(L, "Invalid mode for circle: %s", mode);
     }
-
-    return 0;
-}
-
-int setcolor(lua_State* L) {
-    if (lua_gettop(L) == 0) {
-        CURRENT_COLOR = WHITE;
-        return 0;
-    }
-
-    const float* vector = lua_tovector(L, 1);
-    if (vector != NULL) {
-        CURRENT_COLOR = Color{
-            static_cast<unsigned char>(vector[0]),
-            static_cast<unsigned char>(vector[1]),
-            static_cast<unsigned char>(vector[2]),
-            255
-        };
-        return 0;
-    } else {
-        int r = luaL_checkinteger(L, 1);
-        int g = luaL_checkinteger(L, 2);
-        int b = luaL_checkinteger(L, 3);
-    
-        CURRENT_COLOR = Color{
-            static_cast<unsigned char>(r),
-            static_cast<unsigned char>(g),
-            static_cast<unsigned char>(b),
-            255
-        };
-    }
-
-
-    return 0;
-}
-
-
-int setfontsize(lua_State* L) {
-    int size = luaL_checkinteger(L, 1);
-
-    FONT_SIZE = size;
 
     return 0;
 }
@@ -88,14 +48,18 @@ int print(lua_State* L) {
     const char* text = luaL_checkstring(L, 1);
     int x = luaL_checkinteger(L, 2);
     int y = luaL_checkinteger(L, 3);
+    int fontsize = luaL_checkinteger(L, 4);
+    Color color = color::check_color(L, 5);
 
-    DrawText(text, x, y, FONT_SIZE, CURRENT_COLOR);
+    DrawText(text, x, y, fontsize, color);
 
     return 0;
 }
 
 int clearscreen(lua_State* L) {
-    ClearBackground(CURRENT_COLOR);
+    Color color = color::check_color(L, 1);
+
+    ClearBackground(color);
 
     return 0;
 }
@@ -141,16 +105,6 @@ int adoreopen_graphics(lua_State* L)
         lua_pushcfunction(L, func, name);
         lua_setfield(L, -2, name);
     }
-
-    // Colors
-    lua_createtable(L, 0, std::size(graphics::colors));
-    for (auto& [name, color] : graphics::colors) {
-        lua_pushvector(L, color.r, color.g, color.b);
-        lua_setfield(L, -2, name);
-    }
-
-    lua_setreadonly(L, -1, true);
-    lua_setfield(L, -2, "colors");
 
     lua_setreadonly(L, -1, true);
 
