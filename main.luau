@@ -11,7 +11,7 @@ local SCREEN_HEIGHT = 450
 window.init(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello World!")
 window.setfps(60)
 
-local cat = graphics.texture.load("cat.png")
+local cat = graphics.texture.load("examples/image_exporter/cat.png")
 
 function window.update(dt)
 end
