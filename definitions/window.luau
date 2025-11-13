@@ -17,4 +17,19 @@ function window.draw()
     error("Not implemented")
 end
 
+function window.isfiledropped(): boolean
+    error("Not implemented")
+end
+
+function window.getdroppedfiles(): {string}
+    error("Not implemented")
+end
+
+function window.getmousescroll(): vector
+    error("Not implemented")
+end
+function window.getmousepos(): vector
+    error("Not implemented")
+end
+
 return window

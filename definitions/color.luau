@@ -29,4 +29,8 @@ function color.from(arg: number | string): Color
     error("Not implemented")
 end
 
+function color.fade(col: Color, alpha: number): Color
+    error("Not implemented")
+end
+
 return color

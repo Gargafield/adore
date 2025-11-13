@@ -1,6 +1,7 @@
 #include "adore/graphics.h"
 
 #include "adore/color.h"
+#include "adore/rect.h"
 #include <memory>
 #include "raylib.h"
 #include <iostream>
@@ -9,16 +10,14 @@ namespace graphics {
 
 int rectangle(lua_State* L) {
     const char* mode = luaL_checkstring(L, 1);
-    int x = luaL_checkinteger(L, 2);
-    int y = luaL_checkinteger(L, 3);
-    int width = luaL_checkinteger(L, 4);
-    int height = luaL_checkinteger(L, 5);
-    Color color = color::check_color(L, 6);
+    Rectangle rect;
+    int end = rect::check_rect(L, 2, &rect);
+    Color color = color::check_color(L, end);
 
     if (strcmp(mode, "fill") == 0) {
-        DrawRectangle(x, y, width, height, color);
+        DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
     } else if (strcmp(mode, "line") == 0) {
-        DrawRectangleLines(x, y, width, height, color);
+        DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, color);
     } else {
         luaL_error(L, "Invalid mode for rectangle: %s", mode);
     }
@@ -64,6 +63,17 @@ int clearscreen(lua_State* L) {
     return 0;
 }
 
+int drawtexture(lua_State* L) {
+    Texture2D* texture = texture::check_texture(L, 1);
+    int x = luaL_checkinteger(L, 2);
+    int y = luaL_checkinteger(L, 3);
+    Color tint = color::check_color(L, 4);
+
+    DrawTexture(*texture, x, y, tint);
+
+    return 0;
+}
+
 static const std::pair<const char*, Color> colors[] = {
     {"white", WHITE},
     {"black", BLACK},
@@ -91,7 +101,6 @@ static const std::pair<const char*, Color> colors[] = {
 
 } // namespace graphics
 
-
 int adoreopen_graphics(lua_State* L)
 {
     lua_createtable(L, 0, std::size(graphics::lib));
@@ -103,6 +112,16 @@ int adoreopen_graphics(lua_State* L)
             break;
 
         lua_pushcfunction(L, func, name);
+        lua_setfield(L, -2, name);
+    }
+
+    // Submodules
+    for (auto& [name, func] : graphics::modules)
+    {
+        if (!name || !func)
+            break;
+
+        func(L);
         lua_setfield(L, -2, name);
     }
 

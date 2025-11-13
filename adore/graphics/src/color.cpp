@@ -64,6 +64,17 @@ int from(lua_State* L) {
     return 0;
 }
 
+int fade(lua_State* L) {
+    Color color = check_color(L, 1);
+    float alpha = static_cast<float>(luaL_checknumber(L, 2));
+    if (alpha < 0.0f) alpha = 0.0f;
+    if (alpha > 1.0f) alpha = 1.0f;
+
+    color.a = static_cast<unsigned char>(alpha * 255.0f);
+    lua_pushvector(L, color.r, color.g, color.b);
+    return 1;
+}
+
 } // namespace color
 
 

@@ -7,10 +7,9 @@ namespace window {
 
 static bool initialized = false;
 
-#define WINDOW_NOT_INITIALIZED_CHECK() \
-    if (!initialized) { \
-        luaL_errorL(L, "Window not initialized"); \
-    }
+bool is_window_initialized() {
+    return initialized;
+}
 
 int init(lua_State* L) {
     if (initialized) { \
@@ -36,6 +35,43 @@ int getfps(lua_State* L) {
     WINDOW_NOT_INITIALIZED_CHECK();
     int fps = GetFPS();
     lua_pushinteger(L, fps);
+    return 1;
+}
+
+int isfiledropped(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    bool dropped = IsFileDropped();
+    lua_pushboolean(L, dropped);
+    return 1;
+}
+
+int getdroppedfiles(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+
+    FilePathList files = LoadDroppedFiles();
+    lua_createtable(L, files.count, 0);
+
+    for (unsigned int i = 0; i < files.count; ++i) {
+        lua_pushstring(L, files.paths[i]);
+        lua_rawseti(L, -2, i + 1);
+    }
+
+    UnloadDroppedFiles(files);
+
+    return 1;
+}
+
+int getmousepos(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    Vector2 mousePos = GetMousePosition();
+    lua_pushvector(L, mousePos.x, mousePos.y, 0.0f);
+    return 1;
+}
+
+int getmousescroll(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    Vector2 mouseScroll = GetMouseWheelMoveV();
+    lua_pushvector(L, mouseScroll.x, mouseScroll.y, 0.0f);
     return 1;
 }
 

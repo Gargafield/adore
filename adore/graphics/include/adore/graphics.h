@@ -4,6 +4,8 @@
 #include "lualib.h"
 
 #include "adore/texture.h"
+#include "adore/image.h"
+
 
 // open the library as a table on top of the stack
 int adoreopen_graphics(lua_State* L);
@@ -21,9 +23,15 @@ static const luaL_Reg lib[] = {
     {"circle", circle},
     {"print", print},
     {"clearscreen", clearscreen},
-    {"loadtexture", texture::load_texture},
 
     {nullptr, nullptr},
 };
+
+static const luaL_Reg modules[] = {
+    { "texture", adoreregister_texture },
+    { "image", adoreregister_image },
+    { nullptr, nullptr }
+};
+
 
 } // namespace graphics

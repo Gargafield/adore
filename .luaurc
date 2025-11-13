@@ -1,5 +1,6 @@
 {
     "aliases": {
-        "adore": "./definitions"
+        "adore": "./definitions",
+        "lute": "extern/lute/definitions"
     }
 }
