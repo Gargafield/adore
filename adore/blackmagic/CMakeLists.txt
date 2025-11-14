@@ -10,7 +10,7 @@ target_sources(Adore.Blackmagic PRIVATE
 set_target_properties(Adore.Blackmagic PROPERTIES OUTPUT_NAME adore)
 target_include_directories(Adore.Blackmagic PUBLIC "include")
 target_compile_features(Adore.Blackmagic PUBLIC cxx_std_17)
-target_link_libraries(Adore.Blackmagic PRIVATE Luau.VM)
+target_link_libraries(Adore.Blackmagic PRIVATE Luau.VM uSocket)
 target_compile_options(Adore.Blackmagic PRIVATE ${LUTE_OPTIONS})
 
 IF (WIN32)
