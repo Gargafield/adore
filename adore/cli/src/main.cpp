@@ -17,6 +17,7 @@
 #include "adore/gui.h"
 #ifdef ADORE_BLACKMAGIC
 #include "adore/blackmagic.h"
+#include "adore/hyperdeck.h"
 #endif
 
 namespace adore {
@@ -252,6 +253,7 @@ void setupLuaState(lua_State* L) {
         {"@adore/gui", adoreopen_gui},
 #ifdef ADORE_BLACKMAGIC
         {"@adore/blackmagic", adoreopen_blackmagic},
+        {"@adore/hyperdeck", adoreopen_hyperdeck},
 #endif
     }};
 
