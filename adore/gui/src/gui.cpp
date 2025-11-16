@@ -54,8 +54,8 @@ int title(lua_State* L)
     const char* text = luaL_checkstring(L, end);
     int textSize = GuiGetStyle(DEFAULT, TEXT_SIZE);
     int verticalAlign = GuiGetStyle(DEFAULT, TEXT_ALIGNMENT_VERTICAL);
-    GuiSetStyle(DEFAULT, TEXT_SIZE, textSize + 4);
-    GuiSetStyle(DEFAULT, TEXT_ALIGNMENT_VERTICAL, TEXT_ALIGN_TOP);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, rect.height - 4);
+    GuiSetStyle(DEFAULT, TEXT_ALIGNMENT_VERTICAL, TEXT_ALIGN_CENTER);
     GuiLabel(rect, text);
     GuiSetStyle(DEFAULT, TEXT_SIZE, textSize);
     GuiSetStyle(DEFAULT, TEXT_ALIGNMENT_VERTICAL, verticalAlign);
@@ -72,7 +72,7 @@ int sliderbar(lua_State* L)
     float minValue = static_cast<float>(luaL_checknumber(L, end + 3));
     float maxValue = static_cast<float>(luaL_checknumber(L, end + 4));
 
-    GuiSliderBar(
+    int result = GuiSliderBar(
         rect,
         textLeft,
         textRight,
@@ -80,7 +80,12 @@ int sliderbar(lua_State* L)
         minValue,
         maxValue
     );
-    lua_pushnumber(L, value);
+
+    if (result) {
+        lua_pushnumber(L, value);
+    } else {
+        lua_pushnil(L);
+    }
     
     return 1;
 }

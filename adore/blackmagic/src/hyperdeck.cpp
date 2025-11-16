@@ -272,30 +272,6 @@ struct TransportInfoReader : public ProtocolReader {
     }
 };
 
-static ClipInfo readClipFromLine(const std::string& line) {
-    // 1: blow-me_2.mov QuickTimeProResLT 1080p60 00:00:05:00
-    auto parts = splitString(line, ' ');
-
-    ClipInfo clip;
-    // Remove trailing colon from i
-    clip.clip_id = std::stoi(std::string(parts[0].substr(0, parts[0].length() - 1)));
-    if (parts.size() == 4) {
-        clip.name = std::string(parts[1]);
-        clip.timecode = std::string(parts[2]);
-        clip.duration = std::string(parts[3]);
-    } else if (parts.size() == 5) {
-        clip.name = std::string(parts[1]);
-        clip.format = std::string(parts[2]);
-        clip.timecode = std::string(parts[3]);
-        clip.duration = std::string(parts[4]);
-    } else if (parts.size() == 6) {
-        clip.name = std::string(parts[5]);
-        clip.timecode = std::string(parts[1]);
-        clip.duration = std::string(parts[2]);
-    }
-    return clip;
-};
-
 struct DiskListReader : public ProtocolReader {
     std::vector<ClipInfo> clips;
     bool isSnapshot = false;
@@ -317,7 +293,22 @@ struct DiskListReader : public ProtocolReader {
             return;
         }
 
-        ClipInfo clip = readClipFromLine(line);
+        // 1: blow-me_2.mov QuickTimeProResLT 1080p60 00:00:05:00
+        auto parts = splitString(line, ' ');
+        if (parts.size() < 4) {
+            if (HYPERDECK_DEBUG) {
+                std::cout << "Invalid clip info line: " << line << std::endl;
+            }
+            return;
+        }
+
+        ClipInfo clip;
+        // Remove trailing colon from id
+        clip.clip_id = std::stoi(std::string(parts[0].substr(0, parts[0].length() - 1)));
+        clip.name = std::string(parts[1]);
+        clip.format = std::string(parts[3]);
+        clip.duration = std::string(parts[4]);
+
         this->clips.push_back(clip);
     }
 
@@ -609,7 +600,12 @@ int connect(lua_State* L) {
                 device->state = HYPERDECK_STATE_CONNECTED;
 
                 device->send("notify:\r\ntransport: true\r\nslot: false\r\nremote: true\r\nconfiguration: true\r\ndropped frames: true\r\ndisplay timecode: true\r\ntimeline position: true\r\nplayrange: true\r\ncache: true\r\ndynamic range: true\r\nslate: false\r\nclips: true\r\ndisk: true\r\ndevice info: true\r\nnas: false\r\n\r\n");
-                device->send("device info\r\ndisk list: slot id: 1\r\ntransport info\r\nclips get\r\n");
+                device->send("device info\r\n");
+                device->send("transport info\r\n");
+                device->send("playrange\r\n");
+                device->send("clips get\r\n");
+                device->send("play option\r\n");
+                device->send("disk list\r\n");
 
                 device->token->complete(
                     [device](lua_State* L) {
@@ -628,7 +624,6 @@ int connect(lua_State* L) {
 
     return lua_yield(L, 0);
 }
-
 
 int close(lua_State* L) {
     HyperdeckDevice* device = luaL_checkhyperdeck(L, 1);
@@ -710,6 +705,27 @@ int stop(lua_State* L) {
     return 0;
 }
 
+int _goto(lua_State* L) {
+    HyperdeckDevice* device = luaL_checkhyperdeck(L, 1);
+    const char* type = luaL_checkstring(L, 2);
+
+    std::string command;
+    if (strcmp(type, "clip") == 0) {
+        int clip_id = luaL_checkinteger(L, 3);
+        command = "goto: clip id: " + std::to_string(clip_id) + "\r\n";
+    } else if (strcmp(type, "timecode") == 0) {
+        const char* timecode = luaL_checkstring(L, 3);
+        command = std::string("goto: timecode: ") + timecode + "\r\n";
+    } else if (strcmp(type, "position") == 0) {
+        int position = luaL_checkinteger(L, 3);
+        command = "goto: timeline: " + std::to_string(position) + "\r\n";
+    } else {
+        luaL_error(L, "Invalid goto type: %s", type);
+    }
+
+    device->send(command);
+    return 0;
+}
 
 int index(lua_State* L) {
     const char* key = luaL_checkstring(L, 2);
@@ -817,6 +833,28 @@ int index(lua_State* L) {
     return 1;
 }
 
+struct VideoFormat {
+    const char* name;
+    int width;
+    int height;
+    int frameRate;
+};
+
+static const VideoFormat kVideoFormats[] = {
+    { "720p50", 1280, 720, 50 },
+    { "720p5994", 1280, 720, 60 },
+    { "720p60", 1280, 720, 60 },
+    { "1080p23976", 1920, 1080, 24 },
+    { "1080p24", 1920, 1080, 24 },
+    { "1080p25", 1920, 1080, 25 },
+    { "1080p2997", 1920, 1080, 30 },
+    { "1080p30", 1920, 1080, 30 },
+    { "1080p60", 1920, 1080, 60 },
+    { "1080i50", 1920, 1080, 50 },
+    { "1080i5994", 1920, 1080, 60 },
+    { "1080i60", 1920, 1080, 60 },
+};
+
 } // namespace hyperdeck
 
 static int adoreregister_hyperdeck(lua_State* L)
@@ -857,7 +895,23 @@ int adoreopen_hyperdeck(lua_State* L)
         lua_setfield(L, -2, name);
     }
 
-    lua_setreadonly(L, -1, false);
+    lua_createtable(L, 0, std::size(hyperdeck::kVideoFormats));
+    for (const auto& format : hyperdeck::kVideoFormats) {
+        lua_createtable(L, 0, 3);
+        lua_pushinteger(L, format.width);
+        lua_setfield(L, -2, "width");
+        lua_pushinteger(L, format.height);
+        lua_setfield(L, -2, "height");
+        lua_pushinteger(L, format.frameRate);
+        lua_setfield(L, -2, "framerate");
+        lua_pushstring(L, format.name);
+        lua_setfield(L, -2, "name");
+        lua_setfield(L, -2, format.name);
+    }
+    lua_setreadonly(L, -1, true);
+    lua_setfield(L, -2, "formats");
+
+    lua_setreadonly(L, -1, true);
 
     adoreregister_hyperdeck(L);
 

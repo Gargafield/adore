@@ -31,6 +31,8 @@ int addclip(lua_State* L);
 int play(lua_State* L);
 int stop(lua_State* L);
 
+int _goto(lua_State* L);
+
 static const luaL_Reg udata[] = {
     {"close", close},
     {"send", send},
@@ -38,6 +40,7 @@ static const luaL_Reg udata[] = {
     {"addclip", addclip},
     {"play", play},
     {"stop", stop},
+    {"goto", _goto},
     {nullptr, nullptr},
 };
 

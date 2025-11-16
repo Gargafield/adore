@@ -3,18 +3,22 @@ local hyperdeck = require("@adore/hyperdeck")
 local gui = require("@adore/gui")
 local graphics = require("@adore/graphics")
 local color = require("@adore/color")
+local timecode = require("@adore/timecode")
 
-return function (hyperdeck: hyperdeck.HyperDeck)
+return function (deck: hyperdeck.HyperDeck)
     local scroll = -1
     return function (x: number, y: number, width: number, height: number)
-        local clips = hyperdeck.timeline
-        local playingclipid = hyperdeck.clip
+        local timelineClips = deck.timeline
+        local diskClips = deck.clips
+        local playingclipid = deck.clip
+
         local textstyle = gui.getstyle("label", "text", "normal")
-        scroll = gui.list(x, y, width, height, #clips, scroll, function (index: number, ix: number, iy: number, iw: number, ih: number)
-            local clip = clips[index + 1]
-            local thisplaying = (playingclipid ~= nil and clip.id == playingclipid)
-            local text = string.format("%03d - %s (%s)", clip.id, clip.name, clip.duration)
-            local timeposition = 0
+        scroll = gui.list(x, y, width, height, #timelineClips, scroll, function (index: number, ix: number, iy: number, iw: number, ih: number)
+            local timelineClip = timelineClips[index + 1]
+            local diskClip = diskClips[timelineClip.id]
+
+            local thisplaying = (playingclipid ~= nil and timelineClip.id == playingclipid)
+            local text = string.format("%03d - %s (%s)", timelineClip.id, diskClip.name, diskClip.duration)
             if thisplaying then
                 gui.setstyle("label", "text", "normal", color.green)
             else
@@ -22,7 +26,17 @@ return function (hyperdeck: hyperdeck.HyperDeck)
             end
             gui.title(ix, iy, iw, 30, text)
 
-            gui.sliderbar(ix, iy + 25, iw, 5, "start", "end", 50, 0, 100)
+            local format = hyperdeck.formats[diskClip.format]
+            local startRange = timecode.parse(timelineClip.start, format.framerate).total + 1
+            local endRange = timecode.parse(timelineClip.duration, format.framerate).total + startRange - 1
+            local position = math.clamp(deck.position or 0, startRange, endRange)
+
+            local scrub = gui.sliderbar(ix, iy + 25, iw, 5, timelineClip.start, timelineClip.duration, position, startRange, endRange)
+            if scrub then
+                scrub = math.max(math.round(scrub), 1)
+                deck:goto("position", scrub)
+            end
+            
             graphics.rectangle("line", ix, iy, iw, 30, color.darkgray)
 
             return 30 -- item height

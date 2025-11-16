@@ -4,9 +4,11 @@ add_library(Adore.Blackmagic STATIC)
 target_sources(Adore.Blackmagic PRIVATE
     include/adore/blackmagic.h
     include/adore/hyperdeck.h
+    include/adore/timecode.h
     
     src/blackmagic.cpp
     src/hyperdeck.cpp
+    src/timecode.cpp
 )
 
 set_target_properties(Adore.Blackmagic PROPERTIES OUTPUT_NAME adore)
