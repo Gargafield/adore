@@ -43,9 +43,46 @@ int label(lua_State* L)
     Rectangle rect;
     int end = rect::check_rect(L, 1, &rect);
     const char* text = luaL_checkstring(L, end);
-
     GuiLabel(rect, text);
     return 0;
+}
+
+int title(lua_State* L)
+{
+    Rectangle rect;
+    int end = rect::check_rect(L, 1, &rect);
+    const char* text = luaL_checkstring(L, end);
+    int textSize = GuiGetStyle(DEFAULT, TEXT_SIZE);
+    int verticalAlign = GuiGetStyle(DEFAULT, TEXT_ALIGNMENT_VERTICAL);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, textSize + 4);
+    GuiSetStyle(DEFAULT, TEXT_ALIGNMENT_VERTICAL, TEXT_ALIGN_TOP);
+    GuiLabel(rect, text);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, textSize);
+    GuiSetStyle(DEFAULT, TEXT_ALIGNMENT_VERTICAL, verticalAlign);
+    return 0;
+}
+
+int sliderbar(lua_State* L)
+{
+    Rectangle rect;
+    int end = rect::check_rect(L, 1, &rect);
+    const char* textLeft = luaL_optlstring(L, end, NULL, NULL);
+    const char* textRight = luaL_optlstring(L, end + 1, NULL, NULL);
+    float value = static_cast<float>(luaL_checknumber(L, end + 2));
+    float minValue = static_cast<float>(luaL_checknumber(L, end + 3));
+    float maxValue = static_cast<float>(luaL_checknumber(L, end + 4));
+
+    GuiSliderBar(
+        rect,
+        textLeft,
+        textRight,
+        &value,
+        minValue,
+        maxValue
+    );
+    lua_pushnumber(L, value);
+    
+    return 1;
 }
 
 static int AdoreGuiComboBox(Rectangle bounds, std::vector<const char*> items, int *active)
@@ -179,14 +216,250 @@ int textbox(lua_State* L)
     return 1;
 }
 
+int list(lua_State* L) {
+    Rectangle bounds;
+    int end = rect::check_rect(L, 1, &bounds);
+    int count = luaL_checknumber(L, end);
+    int scrollIndex = luaL_optnumber(L, end + 1, -1);
+    // callback
+    luaL_checktype(L, end + 2, LUA_TFUNCTION);
+
+    int result = 0;
+    GuiState state = guiState;
+
+    // Check if we need a scroll bar
+    bool useScrollBar = scrollIndex >= 0;
+
+    // Define base item rectangle [0]
+    Rectangle itemBounds = { 0 };
+    itemBounds.x = bounds.x + GuiGetStyle(LISTVIEW, LIST_ITEMS_SPACING);
+    itemBounds.y = bounds.y + GuiGetStyle(LISTVIEW, LIST_ITEMS_SPACING) + GuiGetStyle(DEFAULT, BORDER_WIDTH);
+    itemBounds.width = bounds.width - 2*GuiGetStyle(LISTVIEW, LIST_ITEMS_SPACING) - GuiGetStyle(DEFAULT, BORDER_WIDTH);
+    itemBounds.height = (float)(bounds.height - 2*GuiGetStyle(DEFAULT, BORDER_WIDTH) - 2*GuiGetStyle(LISTVIEW, LIST_ITEMS_SPACING));
+    if (useScrollBar) itemBounds.width -= GuiGetStyle(LISTVIEW, SCROLLBAR_WIDTH);
+
+    // Get items on the list
+    int startIndex = (scrollIndex <= 0 ) ? 0 : scrollIndex;
+    if (startIndex > (count - 1)) startIndex = 0;
+
+    // Update control
+    //--------------------------------------------------------------------
+    if ((state != STATE_DISABLED) && !guiLocked && !guiControlExclusiveMode)
+    {
+        Vector2 mousePoint = GetMousePosition();
+
+        // Check mouse inside list view
+        if (CheckCollisionPointRec(mousePoint, bounds))
+        {
+            state = STATE_FOCUSED;
+
+            if (useScrollBar)
+            {
+                int wheelMove = (int)GetMouseWheelMove();
+                startIndex -= wheelMove;
+
+                if (startIndex < 0) startIndex = 0;
+                else if (startIndex > (count - 1)) startIndex = 0;
+            }
+        }
+
+        // Reset item rectangle y to [0]
+        itemBounds.y = bounds.y + GuiGetStyle(LISTVIEW, LIST_ITEMS_SPACING) + GuiGetStyle(DEFAULT, BORDER_WIDTH);
+    }
+    //--------------------------------------------------------------------
+
+    // Draw control
+    //--------------------------------------------------------------------
+    GuiDrawRectangle(bounds, GuiGetStyle(LISTVIEW, BORDER_WIDTH), GetColor(GuiGetStyle(LISTVIEW, BORDER + state*3)), GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));     // Draw background
+
+    // Draw visible items
+    int i;
+    for (i = startIndex; i < count; i++) {
+        lua_pushvalue(L, end + 2); // callback function
+        lua_pushnumber(L, i);
+        lua_pushnumber(L, itemBounds.x);
+        lua_pushnumber(L, itemBounds.y);
+        lua_pushnumber(L, itemBounds.width);
+        lua_pushnumber(L, itemBounds.height);
+        BeginScissorMode(
+            (int)bounds.x + GuiGetStyle(LISTVIEW, BORDER_WIDTH),
+            (int)bounds.y + GuiGetStyle(LISTVIEW, BORDER_WIDTH),
+            (int)(bounds.width - 2*GuiGetStyle(DEFAULT, BORDER_WIDTH)),
+            (int)(bounds.height - 2*GuiGetStyle(DEFAULT, BORDER_WIDTH))
+        );
+        lua_call(L, 5, 1);
+        EndScissorMode();
+        int height = (int)luaL_checknumber(L, -1);
+        lua_pop(L, 1);
+        if (height <= 0) height = 0;
+        float usedHeight = (height + GuiGetStyle(LISTVIEW, LIST_ITEMS_SPACING));
+        itemBounds.y += usedHeight;
+        itemBounds.height -= usedHeight;
+        if (itemBounds.height <= 0) {
+            break;
+        }
+    }
+
+    int endIndex = i;
+    int visibleItems = endIndex - startIndex;
+
+    if (useScrollBar)
+    {
+        Rectangle scrollBarBounds = {
+            bounds.x + bounds.width - GuiGetStyle(LISTVIEW, BORDER_WIDTH) - GuiGetStyle(LISTVIEW, SCROLLBAR_WIDTH),
+            bounds.y + GuiGetStyle(LISTVIEW, BORDER_WIDTH), (float)GuiGetStyle(LISTVIEW, SCROLLBAR_WIDTH),
+            bounds.height - 2*GuiGetStyle(DEFAULT, BORDER_WIDTH)
+        };
+
+        // Calculate percentage of visible items and apply same percentage to scrollbar
+        float percentVisible = (float)(endIndex - startIndex)/count;
+        float sliderSize = bounds.height*percentVisible;
+
+        int prevSliderSize = GuiGetStyle(SCROLLBAR, SCROLL_SLIDER_SIZE);   // Save default slider size
+        int prevScrollSpeed = GuiGetStyle(SCROLLBAR, SCROLL_SPEED); // Save default scroll speed
+        GuiSetStyle(SCROLLBAR, SCROLL_SLIDER_SIZE, (int)sliderSize);            // Change slider size
+        GuiSetStyle(SCROLLBAR, SCROLL_SPEED, count - visibleItems); // Change scroll speed
+
+        startIndex = GuiScrollBar(scrollBarBounds, startIndex, 0, count - visibleItems);
+
+        GuiSetStyle(SCROLLBAR, SCROLL_SPEED, prevScrollSpeed); // Reset scroll speed to default
+        GuiSetStyle(SCROLLBAR, SCROLL_SLIDER_SIZE, prevSliderSize); // Reset slider size to default
+    }
+    //--------------------------------------------------------------------
+
+    if (startIndex <= 0 && endIndex == count) {
+        // All items are visible, no scrolling needed
+        lua_pushnumber(L, -1);
+    } else {
+        lua_pushnumber(L, startIndex);
+    }
+
+    return 1;
+}
+
+static const std::pair<const char*, GuiControl> guiControls[] = {
+    { "default", DEFAULT },
+    { "label", LABEL },
+    { "button", BUTTON },
+    { "toggle", TOGGLE },
+    { "slider", SLIDER },
+    { "progressbar", PROGRESSBAR },
+    { "checkbox", CHECKBOX },
+    { "combobox", COMBOBOX },
+    { "dropdownbox", DROPDOWNBOX },
+    { "textbox", TEXTBOX },
+    { "valuebox", VALUEBOX },
+    { "control11", CONTROL11 },
+    { "listview", LISTVIEW },
+    { "colorpicker", COLORPICKER },
+    { "scrollbar", SCROLLBAR },
+    { "statusbar", STATUSBAR }
+};
+
+static const std::pair<const char*, int> guiProperties[] = {
+    { "border_width", BORDER_WIDTH },
+    { "text_alignment", TEXT_ALIGNMENT },
+    { "text", TEXT },
+    { "base", BASE },
+    { "border", BORDER },
+    { "scrollbar_width", SCROLLBAR_WIDTH },
+    { "scroll_slider_size", SCROLL_SLIDER_SIZE },
+    { "scroll_slider_padding", SCROLL_SLIDER_PADDING },
+    { "scroll_padding", SCROLL_PADDING },
+    { "scroll_speed", SCROLL_SPEED },
+    { "list_items_spacing", LIST_ITEMS_SPACING },
+    { "text_size", TEXT_SIZE },
+    { "text_spacing", TEXT_SPACING },
+    { "line_color", LINE_COLOR },
+    { "background_color", BACKGROUND_COLOR },
+    { "text_line_spacing", TEXT_LINE_SPACING },
+    { "text_alignment_vertical", TEXT_ALIGNMENT_VERTICAL },
+    { "text_wrap_mode", TEXT_WRAP_MODE }
+};
+
+static const std::pair<const char*, int> guiStates[] = {
+    { "none", 0 },
+    { "normal", STATE_NORMAL },
+    { "focused", STATE_FOCUSED },
+    { "pressed", STATE_PRESSED },
+    { "disabled", STATE_DISABLED }
+};
+
 int getstyle(lua_State* L)
 {
-    const int control = static_cast<int>(luaL_checknumber(L, 1));
-    const int property = static_cast<int>(luaL_checknumber(L, 2));
+    const char* controlName = luaL_checkstring(L, 1);
+    const char* propertyName = luaL_checkstring(L, 2);
+    const char* stateName = luaL_checkstring(L, 3);
 
-    int value = GuiGetStyle(control, property);
-    lua_pushnumber(L, value);
+    for (const auto& controlPair : guiControls) {
+        if (strcmp(controlName, controlPair.first) == 0) {
+            for (const auto& propertyPair : guiProperties) {
+                if (strcmp(propertyName, propertyPair.first) == 0) {
+                    for (const auto& statePair : guiStates) {
+                        if (strcmp(stateName, statePair.first) == 0) {
+                            int property = propertyPair.second;
+                            if (property < RAYGUI_MAX_PROPS_BASE) {
+                                property += statePair.second * 3;
+                            }
+                            int value = GuiGetStyle(controlPair.second, property);
+                            lua_pushnumber(L, value);
+                            return 1;
+                        }
+                    }
+                    luaL_error(L, "Unknown GUI state: %s", stateName);
+                }
+            }
+            luaL_error(L, "Unknown GUI property: %s", propertyName);
+        }
+    }
+
+    luaL_error(L, "Unknown GUI control: %s", controlName);
     return 1;
+}
+
+int setstyle(lua_State* L)
+{
+    const char* controlName = luaL_checkstring(L, 1);
+    const char* propertyName = luaL_checkstring(L, 2);
+    const char* stateName = luaL_checkstring(L, 3);
+    int value;
+    if (lua_isnumber(L, 4)) {
+        value = static_cast<int>(luaL_checknumber(L, 4));
+    } else if (lua_isvector(L, 4)) {
+        const float* vec = luaL_checkvector(L, 4);
+        value = ColorToInt(Color {
+            static_cast<unsigned char>(vec[0]),
+            static_cast<unsigned char>(vec[1]),
+            static_cast<unsigned char>(vec[2]),
+            255
+        });
+    } else {
+        luaL_error(L, "Expected number or color for style value");
+    }
+
+    for (const auto& controlPair : guiControls) {
+        if (strcmp(controlName, controlPair.first) == 0) {
+            for (const auto& propertyPair : guiProperties) {
+                if (strcmp(propertyName, propertyPair.first) == 0) {
+                    for (const auto& statePair : guiStates) {
+                        if (strcmp(stateName, statePair.first) == 0) {
+                            int property = propertyPair.second;
+                            if (property < RAYGUI_MAX_PROPS_BASE) {
+                                property += statePair.second * 3;
+                            }
+                            GuiSetStyle(controlPair.second, property, value);
+                            return 0;
+                        }
+                    }
+                    luaL_error(L, "Unknown GUI state: %s", stateName);
+                }
+            }
+            luaL_error(L, "Unknown GUI property: %s", propertyName);
+        }
+    }
+
+    luaL_error(L, "Unknown GUI control: %s", controlName);
+    return 0;
 }
 
 int enable(lua_State* L)

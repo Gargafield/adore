@@ -1,0 +1,41 @@
+--!strict
+
+local hyperdeck = require("@adore/hyperdeck")
+local window = require("@adore/window")
+local graphics = require("@adore/graphics")
+local color = require("@adore/color")
+local gui = require("@adore/gui")
+local task = require("@lute/task")
+
+local playbutton = require("./playbutton")
+local cliplist = require("./cliplist")
+
+window.init(800, 600, "HyperDeck Control Example")
+window.setfps(30)
+
+local deck = hyperdeck.connect("192.168.0.95");
+
+task.wait(1) -- wait for connection to establish
+
+local myplaybutton = playbutton(deck, function (work: string)
+    if work == "play" then
+        deck:play()
+    elseif work == "pause" then
+        deck:stop()
+    end
+end)
+
+local mycliplist = cliplist(deck)
+
+function window.update(dt)
+
+end
+
+function window.draw()
+    graphics.clearscreen(color.raywhite)
+    myplaybutton(0, 0, 100, 50)
+    gui.label(110, 00, 200, 30, "Deck Status: " .. deck.status)
+    gui.label(110, 20, 200, 30, "Connected Clips: " .. #deck.clips)
+    gui.label(110, 40, 200, 30, "Timecode: " .. tostring(deck.timecode))
+    mycliplist(0, 60, 400, 540)
+end

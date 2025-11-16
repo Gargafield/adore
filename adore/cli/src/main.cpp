@@ -173,8 +173,11 @@ static bool runFile(Runtime& runtime, const char* name, lua_State* GL, int progr
                     continue;
                 }
             }
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+            if (!windowCreated) {
+                // yield to avoid busy loop
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
         }
     }
 

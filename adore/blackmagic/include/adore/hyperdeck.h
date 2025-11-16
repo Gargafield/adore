@@ -26,10 +26,18 @@ int index(lua_State* L);
 
 int close(lua_State* L);
 int send(lua_State* L);
+int clear(lua_State* L);
+int addclip(lua_State* L);
+int play(lua_State* L);
+int stop(lua_State* L);
 
 static const luaL_Reg udata[] = {
     {"close", close},
     {"send", send},
+    {"clear", clear},
+    {"addclip", addclip},
+    {"play", play},
+    {"stop", stop},
     {nullptr, nullptr},
 };
 
