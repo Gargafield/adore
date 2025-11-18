@@ -27,10 +27,22 @@ static const luaL_Reg lib[] = {
 int close(lua_State* L);
 int index(lua_State* L);
 int fadetoblack(lua_State* L);
+int setpreview(lua_State* L);
+int getpreview(lua_State* L);
+int setprogram(lua_State* L);
+int getprogram(lua_State* L);
+int cut(lua_State* L);
+int transition(lua_State* L);
 
 static const luaL_Reg udata[] = {
     {"close", close},
     {"fadetoblack", fadetoblack},
+    {"setpreview", setpreview},
+    {"getpreview", getpreview},
+    {"setprogram", setprogram},
+    {"getprogram", getprogram},
+    {"cut", cut},
+    {"transition", transition},
     {nullptr, nullptr},
 };
 
