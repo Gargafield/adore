@@ -131,7 +131,7 @@ int adoreregister_texture(lua_State* L)
 
     lua_pop(L, 1);
 
-    lua_newtable(L, 0, std::size(texture::lib));
+    lua_createtable(L, 0, std::size(texture::lib));
     luaL_register(L, nullptr, texture::lib); //
     lua_setreadonly(L, -1, true);
 

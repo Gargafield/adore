@@ -23,6 +23,9 @@ int isfiledropped(lua_State* L);
 int getdroppedfiles(lua_State* L);
 int getmousepos(lua_State* L);
 int getmousescroll(lua_State* L);
+int setfullscreen(lua_State* L);
+int isfullscreen(lua_State* L);
+
 
 int noop(lua_State* L);
 
@@ -36,6 +39,8 @@ static const luaL_Reg lib[] = {
     {"getdroppedfiles", getdroppedfiles},
     {"getmousepos", getmousepos},
     {"getmousescroll", getmousescroll},
+    {"setfullscreen", setfullscreen},
+    {"isfullscreen", isfullscreen},
     {nullptr, nullptr}
 };
 

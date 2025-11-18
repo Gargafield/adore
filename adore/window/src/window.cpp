@@ -75,6 +75,23 @@ int getmousescroll(lua_State* L) {
     return 1;
 }
 
+int setfullscreen(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    bool fullscreen = luaL_optboolean(L, 1, true);
+    bool isFullscreen = IsWindowFullscreen();
+    if (fullscreen != isFullscreen) {
+        ToggleFullscreen();
+    }
+    return 0;
+}
+
+int isfullscreen(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    bool isFullscreen = IsWindowFullscreen();
+    lua_pushboolean(L, isFullscreen);
+    return 1;
+}
+
 int noop(lua_State* L) {
     // No operation function
     return 0;

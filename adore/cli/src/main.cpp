@@ -14,6 +14,7 @@
 #include "adore/window.h"
 #include "adore/graphics.h"
 #include "adore/color.h"
+#include "adore/input.h"
 #include "adore/gui.h"
 #ifdef ADORE_BLACKMAGIC
 #include "adore/blackmagic.h"
@@ -256,6 +257,7 @@ void setupLuaState(lua_State* L) {
         {"@adore/graphics", adoreopen_graphics},
         {"@adore/color", adoreopen_color},
         {"@adore/gui", adoreopen_gui},
+        {"@adore/input", adoreopen_input},
 #ifdef ADORE_BLACKMAGIC
         {"@adore/blackmagic", adoreopen_blackmagic},
         {"@adore/hyperdeck", adoreopen_hyperdeck},

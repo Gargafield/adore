@@ -5,6 +5,14 @@ function window.init(width: number, height: number, title: string)
     error("Not implemented")
 end
 
+function window.setfullscreen(fullscreen: boolean?)
+    error("Not implemented")
+end
+
+function window.isfullscreen(): boolean
+    error("Not implemented")
+end
+
 function window.setfps(fps: number)
     error("Not implemented")
 end

@@ -9,8 +9,9 @@ add_subdirectory(extern/raylib)
 
 add_subdirectory(adore/window)
 add_subdirectory(adore/graphics)
-add_subdirectory(adore/cli)
 add_subdirectory(adore/gui)
+add_subdirectory(adore/input)
+add_subdirectory(adore/cli)
 
 IF (ADORE_BLACKMAGIC)
     add_subdirectory(adore/blackmagic)

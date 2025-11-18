@@ -9,6 +9,7 @@ SET(ADORE_MODULES
     Adore.Window
     Adore.Graphics
     Adore.Gui
+    Adore.Input
 )
 
 IF (ADORE_BLACKMAGIC)
