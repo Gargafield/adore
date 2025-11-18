@@ -1,3 +1,4 @@
+--!strict
 
 local atem = require("@adore/atem")
 local task = require("@lute/task")
