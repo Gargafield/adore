@@ -1,32 +1,13 @@
---!strict
 
-local hyperdeck = require("@adore/hyperdeck")
+local atem = require("@adore/atem")
 local task = require("@lute/task")
 
-print("Starting...")
-task.wait(6)
-print("Connecting...")
-local deck = hyperdeck.connect("192.168.0.95");
+local myatem = atem.connect("192.168.0.90")
 
-while not deck.ready and deck.state ~= "disconnected" do
-    print("Waiting for deck to be ready...")
-    task.wait(0.1)
-end
-task.wait(0.5)
+print(myatem.name)
+myatem:fadetoblack(true)
+task.wait(3)
+myatem:fadetoblack(false)
 
-if deck.state == "connected" then
-    print("Deck is ready!")
-    print("Model: ", deck.model)
-    for _, clip in deck.clips do
-        print("Clip: ", clip.name, clip.duration)
-    end
-else
-    print("Failed to connect to deck.")
-end
+myatem:close()
 
-while deck.state == "connected" do
-    task.wait(1)
-end
-
-print("Closing connection...")
-deck:close()

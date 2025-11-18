@@ -19,6 +19,7 @@
 #include "adore/blackmagic.h"
 #include "adore/hyperdeck.h"
 #include "adore/timecode.h"
+#include "adore/atem.h"
 #endif
 
 namespace adore {
@@ -259,6 +260,7 @@ void setupLuaState(lua_State* L) {
         {"@adore/blackmagic", adoreopen_blackmagic},
         {"@adore/hyperdeck", adoreopen_hyperdeck},
         {"@adore/timecode", adoreopen_timecode},
+        {"@adore/atem", adoreopen_atem},
 #endif
     }};
 
