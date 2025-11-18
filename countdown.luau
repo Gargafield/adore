@@ -1,3 +1,4 @@
+--!strict
 
 local graphics = require("@adore/graphics")
 local task = require("@lute/task")
@@ -13,23 +14,26 @@ window.init(SCREEN_WIDTH, SCREEN_HEIGHT, "Countdown")
 window.setfps(60)
 
 local startTime = time.now()
-local countdown = 60 * 60 * 60; -- 60 minutes
+local countdown = 60 * 60; -- 60 minutes
 local timer = countdown
 
 local green = vector.create(0, 255, 0)
 
 function window.update(dt)
-    timer = math.max(countdown - time.since(startTime), 0)
+    timer = math.max(countdown - (time.now() - startTime):toseconds(), 0)
 
     if input.ispressed(input.keys["f"]) then
         window.setfullscreen(not window.isfullscreen())
     end
+
+    countdown += window.getmousescroll().y * 5
+    print(timer)
 end
 
 function window.draw()
     graphics.clearscreen(green)
     
-    local minutes = math.floor(timer / (60 * 60))
+    local minutes = math.floor(timer / 60)
     local seconds = math.floor(timer % 60)
     local text = string.format("%02d:%02d", minutes, seconds)
     local fontsize = 100
