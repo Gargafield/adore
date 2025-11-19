@@ -13,7 +13,7 @@
 #include <uv.h>
 #include "BMDSwitcherAPI.tlh"
 
-#define HYPERDECK_DEBUG 1
+#define HYPERDECK_DEBUG 0
 
 namespace hyperdeck {
 
@@ -366,7 +366,7 @@ struct ConnectionInfoReader : public ProtocolReader {
             device->deviceInfo.protocol_version = line.substr(18);
             return;
         } else if (line._Starts_with("model")) {
-            device->deviceInfo.model = line.substr(6);
+            device->deviceInfo.model = line.substr(7);
             return;
         }
     }

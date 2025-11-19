@@ -35,6 +35,9 @@ gui.sliderbar = (nil :: any) ::
     ((x: number, y: number, width: number, height: number, left: string, right: string, value: number, min: number, max: number) -> number?)
     & ((box: { number }, left: string, right: string, value: number, min: number, max: number) -> number?)
 
+gui.panel = (nil :: any) ::
+    ((x: number, y: number, width: number, height: number, title: string?) -> ())
+    & ((box: { number }, title: string?) -> ())
 
 type GuiControls = "default" | "label" | "button" | "toggle" | "slider" | "progressbar" | "checkbox" | "combobox" | "dropdownbox" | "textbox" | "valuebox" | "control11" | "listview" | "colorpicker" | "scrollbar" | "statusbar" 
 type GuiStates = "none" | "normal" | "focused" | "pressed" | "disabled"

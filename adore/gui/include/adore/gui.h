@@ -17,6 +17,9 @@ int combobox(lua_State* L);
 int textbox(lua_State* L);
 int list(lua_State* L);
 int sliderbar(lua_State* L);
+int panel(lua_State* L);
+int valuebox(lua_State* L);
+int spinner(lua_State* L);
 
 int getstyle(lua_State* L);
 int setstyle(lua_State* L);
@@ -32,6 +35,9 @@ static const luaL_Reg lib[] = {
     {"textbox", textbox},
     {"list", list},
     {"sliderbar", sliderbar},
+    {"panel", panel},
+    {"valuebox", valuebox},
+    {"spinner", spinner},
     
     {"getstyle", getstyle},
     {"setstyle", setstyle},

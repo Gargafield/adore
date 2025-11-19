@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <string>
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
@@ -88,6 +89,21 @@ int sliderbar(lua_State* L)
     }
     
     return 1;
+}
+
+int panel(lua_State* L)
+{
+    Rectangle rect;
+    int end = rect::check_rect(L, 1, &rect);
+    const char* text = nullptr;
+    if (lua_isstring(L, end)) {
+        text = luaL_checkstring(L, end);
+    }
+    GuiPanel(
+        rect,
+        text
+    );
+    return 0;
 }
 
 static int AdoreGuiComboBox(Rectangle bounds, std::vector<const char*> items, int *active)
@@ -281,7 +297,7 @@ int list(lua_State* L) {
     int i;
     for (i = startIndex; i < count; i++) {
         lua_pushvalue(L, end + 2); // callback function
-        lua_pushnumber(L, i);
+        lua_pushnumber(L, i + 1); // item index (1-based)
         lua_pushnumber(L, itemBounds.x);
         lua_pushnumber(L, itemBounds.y);
         lua_pushnumber(L, itemBounds.width);
@@ -338,6 +354,54 @@ int list(lua_State* L) {
     } else {
         lua_pushnumber(L, startIndex);
     }
+
+    return 1;
+}
+
+int valuebox(lua_State* L)
+{
+    Rectangle rect;
+    int end = rect::check_rect(L, 1, &rect);
+    int value = static_cast<int>(luaL_checknumber(L, end));
+    int minValue = static_cast<int>(luaL_checknumber(L, end + 1));
+    int maxValue = static_cast<int>(luaL_checknumber(L, end + 2));
+    const char* text = luaL_optlstring(L, end + 3, NULL, NULL);
+    bool editMode = luaL_optboolean(L, end + 4, true);
+
+    int result = GuiValueBox(
+        rect,
+        text,
+        &value,
+        minValue,
+        maxValue,
+        editMode
+    );
+
+    lua_pushnumber(L, value);
+
+    return 1;
+}
+
+int spinner(lua_State* L)
+{
+    Rectangle rect;
+    int end = rect::check_rect(L, 1, &rect);
+    int value = static_cast<int>(luaL_checknumber(L, end));
+    int minValue = static_cast<int>(luaL_checknumber(L, end + 1));
+    int maxValue = static_cast<int>(luaL_checknumber(L, end + 2));
+    const char* text = luaL_optlstring(L, end + 3, NULL, NULL);
+    bool editMode = luaL_optboolean(L, end + 4, true);
+
+    int result = GuiSpinner(
+        rect,
+        text,
+        &value,
+        minValue,
+        maxValue,
+        editMode
+    );
+
+    lua_pushnumber(L, value);
 
     return 1;
 }

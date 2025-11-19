@@ -14,7 +14,7 @@ return function (deck: hyperdeck.HyperDeck)
 
         local textstyle = gui.getstyle("label", "text", "normal")
         scroll = gui.list(x, y, width, height, #timelineClips, scroll, function (index: number, ix: number, iy: number, iw: number, ih: number)
-            local timelineClip = timelineClips[index + 1]
+            local timelineClip = timelineClips[index]
             local diskClip = diskClips[timelineClip.id]
 
             local thisplaying = (playingclipid ~= nil and timelineClip.id == playingclipid)
