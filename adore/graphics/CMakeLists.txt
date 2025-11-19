@@ -7,12 +7,14 @@ target_sources(Adore.Graphics PRIVATE
     include/adore/texture.h
     include/adore/image.h
     include/adore/rect.h
+    include/adore/font.h
 
     src/graphics.cpp
     src/color.cpp
     src/texture.cpp
     src/image.cpp
     src/rect.cpp
+    src/font.cpp
 )
 
 set_target_properties(Adore.Graphics PROPERTIES OUTPUT_NAME adore)

@@ -3,6 +3,8 @@ local color = require("@adore/color")
 
 local graphics = {}
 
+type TextureFilter = number 
+
 export type Texture = {
     id: number,
     width: number,
@@ -36,12 +38,32 @@ graphics.texture = {} :: {
     fromimage: (image: Image) -> Texture,
     draw: ((self: Texture, x: number, y: number, tint: color.Color?) -> ())
         & (self: Texture, x: number, y: number, rotation: number, scale: number, tint: color.Color?) -> (),
+    setfilter: (self: Texture, filter: TextureFilter) -> (),
+    filter: {
+        point: TextureFilter,
+        bilinear: TextureFilter,
+        trilinear: TextureFilter,
+        anisotropic_4x: TextureFilter,
+        anisotropic_8x: TextureFilter,
+        anisotropic_16x: TextureFilter,
+    }
 }
 
 graphics.image = {} :: {
-    load: (path: string) -> Image,
+    load: (path: string, size: number?) -> Image,
     format: (image: Image, format: ImageFormat) -> Image,
     export: (image: Image, path: string) -> (),
+}
+
+type Font = {
+    texture: Texture,
+}
+
+graphics.font = {} :: {
+    load: (path: string) -> Font,
+    draw: (font: Font, x: number, y: number, size: number, text: string, color: color.Color, spacing: number?) -> (),
+    measure: (font: Font, size: number, text: string, spacing: number?) -> vector,
+    getdefault: () -> Font,
 }
 
 function graphics.clearscreen(color: color.Color)

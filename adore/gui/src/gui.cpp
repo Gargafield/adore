@@ -382,8 +382,7 @@ int valuebox(lua_State* L)
     return 1;
 }
 
-int spinner(lua_State* L)
-{
+int spinner(lua_State* L) {
     Rectangle rect;
     int end = rect::check_rect(L, 1, &rect);
     int value = static_cast<int>(luaL_checknumber(L, end));

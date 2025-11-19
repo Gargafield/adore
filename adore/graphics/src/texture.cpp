@@ -107,6 +107,24 @@ int draw_texture(lua_State* L) {
     return 0;
 }
 
+int set_filter(lua_State* L) {
+    Texture2D* texture = check_texture(L, 1);
+    int filter = luaL_checkinteger(L, 2);
+
+    SetTextureFilter(*texture, filter);
+
+    return 0;
+}
+
+static const std::pair<const char*, TextureFilter> filterModes[] = {
+    { "point", TextureFilter::TEXTURE_FILTER_POINT },
+    { "bilinear", TextureFilter::TEXTURE_FILTER_BILINEAR },
+    { "trilinear", TextureFilter::TEXTURE_FILTER_TRILINEAR },
+    { "anisotropic_4x", TextureFilter::TEXTURE_FILTER_ANISOTROPIC_4X },
+    { "anisotropic_8x", TextureFilter::TEXTURE_FILTER_ANISOTROPIC_8X },
+    { "anisotropic_16x", TextureFilter::TEXTURE_FILTER_ANISOTROPIC_16X },
+};
+
 } // namespace texture
 
 
@@ -125,7 +143,7 @@ int adoreregister_texture(lua_State* L)
         [](lua_State* L, void* ud)
         {
             Texture2D* texture = static_cast<Texture2D*>(ud);
-            UnloadTexture(*texture);
+            // UnloadTexture(*texture); // We'll need a better form of resource management later
         }
     );
 
@@ -133,6 +151,16 @@ int adoreregister_texture(lua_State* L)
 
     lua_createtable(L, 0, std::size(texture::lib));
     luaL_register(L, nullptr, texture::lib); //
+
+    lua_createtable(L, 0, std::size(texture::filterModes));
+    for (const auto& pair : texture::filterModes) {
+        lua_pushinteger(L, pair.second);
+        lua_setfield(L, -2, pair.first);
+    }
+
+    lua_setreadonly(L, -1, true);
+    lua_setfield(L, -2, "filter");
+    
     lua_setreadonly(L, -1, true);
 
     return 1;

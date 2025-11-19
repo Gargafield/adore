@@ -5,6 +5,7 @@
 
 #include "adore/texture.h"
 #include "adore/image.h"
+#include "adore/font.h"
 
 
 // open the library as a table on top of the stack
@@ -30,6 +31,7 @@ static const luaL_Reg lib[] = {
 static const luaL_Reg modules[] = {
     { "texture", adoreregister_texture },
     { "image", adoreregister_image },
+    { "font", adoreregister_font },
     { nullptr, nullptr }
 };
 
