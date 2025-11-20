@@ -6,7 +6,12 @@ local hyperdeck = require("@adore/hyperdeck")
 local atem = require("@adore/atem")
 local gui = require("@adore/gui")
 
-local connector = require("./connector")
+local operations = require("./standardoperations")
+
+local devices = require("./devices")
+
+devices.connectHyperdeck("192.168.0.95")
+devices.connectAtem("192.168.0.90")
 
 local SCREEN_WIDTH = 1440
 local SCREEN_HEIGHT = 810

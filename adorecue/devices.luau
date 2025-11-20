@@ -3,11 +3,11 @@ local state = require("./state")
 local atem = require("@adore/atem")
 local hyperdeck = require("@adore/hyperdeck")
 
-local connector = {}
+local devices = {}
 
 local id_counter = 0
 
-function connector.connectAtem(address: string): atem.Atem?
+function devices.connectAtem(address: string): atem.Atem?
     local at = atem.connect(address)
     if at then
         table.insert(state.devices, {
@@ -22,7 +22,7 @@ function connector.connectAtem(address: string): atem.Atem?
     return nil
 end
 
-function connector.connectHyperdeck(address: string): hyperdeck.HyperDeck?
+function devices.connectHyperdeck(address: string): hyperdeck.HyperDeck?
     local hd = hyperdeck.connect(address)
     if hd then
         table.insert(state.devices, {
@@ -37,4 +37,13 @@ function connector.connectHyperdeck(address: string): hyperdeck.HyperDeck?
     return nil
 end
 
-return connector
+function devices.getDeviceById(id: number): state.Device?
+    for _, device in state.devices do
+        if device.id == id then
+            return device
+        end
+    end
+    return nil
+end
+
+return devices

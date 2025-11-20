@@ -11,6 +11,33 @@ export type Device = {
     object: hyperdeck.HyperDeck | atem.Atem,
 }
 
+export type SourceType = "clip"
+
+export type Source = {
+    name: string,
+    id: number,
+    deviceId: number,
+    type: SourceType
+}
+
+export type Operation<T...> = {
+    name: string,
+    id: number,
+    action: (T...) -> (boolean, string?),
+}
+
+export type Task = {
+    operationId: number,
+    params: { any },
+}
+
+export type Timeline = {
+    name: string,
+    tasks: { Task },
+}
+
 return {
-    devices = {} :: { Device }
+    devices = {} :: { Device },
+    operations = {} :: { Operation<...any> },
+    timelines = {} :: { Timeline },
 }

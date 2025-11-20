@@ -39,9 +39,13 @@ gui.panel = (nil :: any) ::
     ((x: number, y: number, width: number, height: number, title: string?) -> ())
     & ((box: { number }, title: string?) -> ())
 
-type GuiControls = "default" | "label" | "button" | "toggle" | "slider" | "progressbar" | "checkbox" | "combobox" | "dropdownbox" | "textbox" | "valuebox" | "control11" | "listview" | "colorpicker" | "scrollbar" | "statusbar" 
-type GuiStates = "none" | "normal" | "focused" | "pressed" | "disabled"
-type GuiProperties = "border_width" | "text_alignment" | "text" | "base" | "border" | "scrollbar_width" | "scroll_slider_size" | "scroll_slider_padding" | "scroll_padding" | "scroll_speed" | "list_items_spacing" | "text_size" | "text_spacing" | "line_color" | "background_color" | "text_line_spacing" | "text_alignment_vertical" | "text_wrap_mode"
+gui.spinner = (nil :: any) ::
+    ((x: number, y: number, width: number, height: number, value: number, min: number, max: number, text: string?, textEdit: boolean) -> number)
+    & ((box: { number }, value: number, min: number, max: number, text: string?, textEdit: boolean) -> number)
+
+export type GuiControls = "default" | "label" | "button" | "toggle" | "slider" | "progressbar" | "checkbox" | "combobox" | "dropdownbox" | "textbox" | "valuebox" | "control11" | "listview" | "colorpicker" | "scrollbar" | "statusbar" 
+export type GuiStates = "none" | "normal" | "focused" | "pressed" | "disabled"
+export type GuiProperties = "border_width" | "text_alignment" | "text" | "base" | "border" | "scrollbar_width" | "scroll_slider_size" | "scroll_slider_padding" | "scroll_padding" | "scroll_speed" | "list_items_spacing" | "text_size" | "text_spacing" | "line_color" | "background_color" | "text_line_spacing" | "text_alignment_vertical" | "text_wrap_mode"
 
 gui.setstyle = (nil :: any) ::
     ((control: GuiControls, property: GuiProperties, state: GuiStates, value: number | vector) -> ())

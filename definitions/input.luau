@@ -3,7 +3,11 @@ local input = {}
 
 type KeyboardKey = number
 
-function input.ispressed(key: KeyboardKey): boolean
+function input.haspressed(key: KeyboardKey): boolean
+    error("Not implemented")
+end
+
+function input.isdown(key: KeyboardKey): boolean
     error("Not implemented")
 end
 

@@ -695,7 +695,36 @@ int addclip(lua_State* L) {
 
 int play(lua_State* L) {
     HyperdeckDevice* device = luaL_checkhyperdeck(L, 1);
-    device->send("play\r\n");
+
+    if (lua_gettop(L) >= 2) {
+        std::string command = "play: ";
+        int clipId = luaL_checkinteger(L, 2);
+        command += "clip id: " + std::to_string(clipId);
+
+        if (lua_gettop(L) >= 3 && lua_istable(L, 3)) {
+            if (lua_getfield(L, 3, "single") == LUA_TBOOLEAN) {
+                if (lua_toboolean(L, -1)) {
+                    command += " single clip: true";
+                } else {
+                    command += " single clip: false";
+                }
+            }
+            lua_pop(L, 1);
+            if (lua_getfield(L, 3, "loop") == LUA_TBOOLEAN) {
+                if (lua_toboolean(L, -1)) {
+                    command += " loop: true";
+                } else {
+                    command += " loop: false";
+                }
+            }
+        }
+
+        command += "\r\n";
+        device->send(command);
+    } else {
+        device->send("play\r\n");
+    }
+
     return 0;
 }
 

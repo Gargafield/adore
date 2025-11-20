@@ -118,10 +118,17 @@ static const std::pair<const char*, KeyboardKey> kKeysMap[] = {
     { "volume_down", KeyboardKey::KEY_VOLUME_DOWN },
 };
 
-int ispressed(lua_State* L) {
+int haspressed(lua_State* L) {
     int key = luaL_checkinteger(L, 1);
     bool pressed = IsKeyPressed(static_cast<KeyboardKey>(key));
     lua_pushboolean(L, pressed);
+    return 1;
+}
+
+int isdown(lua_State* L) {
+    int key = luaL_checkinteger(L, 1);
+    bool down = IsKeyDown(static_cast<KeyboardKey>(key));
+    lua_pushboolean(L, down);
     return 1;
 }
 

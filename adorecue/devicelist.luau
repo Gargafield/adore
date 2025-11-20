@@ -6,9 +6,10 @@ local atem = require("@adore/atem")
 local color = require("@adore/color")
 local task = require("@lute/task")
 local timecode = require("@adore/timecode")
+local input = require("@adore/input")
 
 local state = require("./state")
-local connector = require("./connector")
+local devices = require("./devices")
 local bufutil = require("./bufutil")
 
 local function drawHyperdeck(device: state.Device, x: number, y: number, width: number, height: number)
@@ -73,19 +74,77 @@ local function drawHyperdeck(device: state.Device, x: number, y: number, width: 
         end)
     end
 
-    return 90
+    return 100
+end
+
+local function get_styles(control: gui.GuiControls, property: gui.GuiProperties)
+    local styles = {}
+    for _, state in { "none", "normal", "focused", "pressed", "disabled" } :: { gui.GuiStates } do
+        styles[state] = gui.getstyle(control, property, state)
+    end
+    return styles
+end
+
+local function apply_styles(control: gui.GuiControls, property: gui.GuiProperties, styles: { [gui.GuiStates]: number | vector })
+    for state, value in styles do
+        gui.setstyle(control, property, state, value)
+    end
 end
 
 local function drawAtem(device: state.Device, x: number, y: number, width: number, height: number)
     local at = device.object :: atem.Atem
 
-    graphics.print(device.name, x + 10, y + 10, 20, color.white)
+    graphics.rectangle("fill", x, y, width, 100, color.lightgray)
 
-    return 50
+    local newValue = gui.spinner(x + 5, y + 5, 80, 20, device.id or 0, 0, 99, nil, false)
+    if newValue ~= device.id then
+        device.id = newValue
+    end
+
+    graphics.print(`{at.name}`, x + 90, y + 5, 20, color.black)
+
+    local sources = at.sources
+    local inputs = at.input
+    local preview = at:getpreview()
+    local program = at:getprogram()
+
+    -- Input controls
+    local inputWidth = (width - 15) / #inputs
+    local buttonStyles = get_styles("button", "base")
+    for i, inputSource in inputs do
+        local changedBase = true
+        local ispreview = preview ~= nil and inputSource.id == preview.id
+        local isprogram = program ~= nil and inputSource.id == program.id
+        if ispreview and isprogram then
+            gui.setstyle("button", "base", "normal", color.yellow)
+        elseif isprogram then
+            gui.setstyle("button", "base", "normal", color.red)
+        elseif ispreview then
+            gui.setstyle("button", "base", "normal", color.green)
+        else
+            changedBase = false
+        end
+
+        if gui.button(x + 5 + ((i - 1) * inputWidth), y + 35, inputWidth - 5, 30, `{inputSource.id}\n{inputSource.shortname}`) then
+            task.spawn(function()
+                if input.isdown(input.keys["left_shift"]) then
+                    at:setprogram(inputSource)
+                else
+                    at:setpreview(inputSource)
+                end
+            end)
+        end
+
+        if changedBase then
+            apply_styles("button", "base", buttonStyles)
+        end
+    end
+
+    return 90
 end
 
 return function ()
-    local scroll = 0
+    local scroll = -1
 
     local addressBuffer = buffer.create(16)
     local function resetAddressBuffer()
@@ -126,13 +185,13 @@ return function ()
             errorMessage = ""
 
             if selectedDeviceType == "deck" then
-                task.spawn(connector.connectHyperdeck, address)
+                task.spawn(devices.connectHyperdeck, address)
             elseif selectedDeviceType == "atem" then
-                task.spawn(connector.connectAtem, address)
+                task.spawn(devices.connectAtem, address)
             end
         end
 
-        gui.list(x, y + 100, width, height - 95, #devices, scroll, function(index: number, x: number, y: number, width: number, height: number)
+        scroll = gui.list(x, y + 100, width, height - 95, #devices, scroll, function(index: number, x: number, y: number, width: number, height: number)
             local usedHeight = 0
             local device = devices[index]
             if device.type == "hyperdeck" then
