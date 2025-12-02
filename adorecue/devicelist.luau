@@ -73,7 +73,7 @@ local function drawHyperdeck(device: state.Device, x: number, y: number, width: 
         end)
     end
 
-    return 90
+    return 100
 end
 
 local function drawAtem(device: state.Device, x: number, y: number, width: number, height: number)
@@ -85,7 +85,7 @@ local function drawAtem(device: state.Device, x: number, y: number, width: numbe
 end
 
 return function ()
-    local scroll = 0
+    local scroll = -1
 
     local addressBuffer = buffer.create(16)
     local function resetAddressBuffer()
@@ -132,7 +132,7 @@ return function ()
             end
         end
 
-        gui.list(x, y + 100, width, height - 95, #devices, scroll, function(index: number, x: number, y: number, width: number, height: number)
+        scroll = gui.list(x, y + 100, width, height - 95, #devices, scroll, function(index: number, x: number, y: number, width: number, height: number)
             local usedHeight = 0
             local device = devices[index]
             if device.type == "hyperdeck" then
