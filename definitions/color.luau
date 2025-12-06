@@ -34,4 +34,8 @@ function color.fade(col: Color, alpha: number): Color
     error("Not implemented")
 end
 
+function color.rgb(r: number, g: number, b: number, a: number?): Color
+    error("Not implemented")
+end
+
 return color
