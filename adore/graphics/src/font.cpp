@@ -80,7 +80,7 @@ int measure_text(lua_State* L) {
 
     Vector2 dimensions = MeasureTextEx(*font, text, static_cast<float>(size), spacing);
 
-    lua_pushvector(L, dimensions.x, dimensions.y, 0.0f);
+    lua_pushvector(L, dimensions.x, dimensions.y, 0.0f, 0.0f);
     return 1;
 }
 

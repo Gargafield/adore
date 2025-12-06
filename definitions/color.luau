@@ -23,6 +23,7 @@ local color = {
     brown = vector.create(0, 0, 0),
     darkbrown = vector.create(0, 0, 0),
     raywhite = vector.create(0, 0, 0),
+    blank = vector.create(0, 0, 0),
 }
 
 function color.from(arg: number | string): Color
