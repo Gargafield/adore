@@ -13,7 +13,7 @@
 #include <uv.h>
 #include "BMDSwitcherAPI.tlh"
 
-#define HYPERDECK_DEBUG 0
+#define HYPERDECK_DEBUG 1
 
 namespace hyperdeck {
 
@@ -697,34 +697,35 @@ int play(lua_State* L) {
     HyperdeckDevice* device = luaL_checkhyperdeck(L, 1);
 
     if (lua_gettop(L) >= 2) {
-        std::string command = "play: ";
-        int clipId = luaL_checkinteger(L, 2);
-        command += "clip id: " + std::to_string(clipId);
+        int clip_id = luaL_checkinteger(L, 2);
+        std::string command = "play: clip id: " + std::to_string(clip_id);
 
         if (lua_gettop(L) >= 3 && lua_istable(L, 3)) {
-            if (lua_getfield(L, 3, "single") == LUA_TBOOLEAN) {
-                if (lua_toboolean(L, -1)) {
-                    command += " single clip: true";
-                } else {
-                    command += " single clip: false";
-                }
+            lua_getfield(L, 3, "loop");
+            if (lua_isboolean(L, -1)) {
+                if (lua_toboolean(L, -1))
+                    command += " loop: true";
+                else
+                    command += " loop: false";
             }
             lua_pop(L, 1);
-            if (lua_getfield(L, 3, "loop") == LUA_TBOOLEAN) {
-                if (lua_toboolean(L, -1)) {
-                    command += " loop: true";
-                } else {
-                    command += " loop: false";
-                }
+            lua_getfield(L, 3, "single");
+            if (lua_isboolean(L, -1)) {
+                if (lua_toboolean(L, -1))
+                    command += " single clip: true";
+                else
+                    command += " single clip: false";
             }
+            lua_pop(L, 1);
         }
 
         command += "\r\n";
         device->send(command);
-    } else {
-        device->send("play\r\n");
+
+        return 0;
     }
 
+    device->send("play\r\n");
     return 0;
 }
 

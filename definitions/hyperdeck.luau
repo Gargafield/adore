@@ -32,7 +32,7 @@ export type HyperDeck = {
     timeline: { TimelineClip },
     close: (self: HyperDeck) -> (),
     play: ((self: HyperDeck) -> ())
-        & ((self: HyperDeck, clipId: number, settings: { single: boolean?, loop: boolean? }?) -> ()),
+        & (self: HyperDeck, clip_id: number, settings: { loop: boolean, single: boolean }?) -> (),
     stop: (self: HyperDeck) -> (),
     goto: ((self: HyperDeck, mode: "timecode", value: string) -> ())
         & ((self: HyperDeck, mode: "position", value: number) -> ())

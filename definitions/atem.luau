@@ -18,7 +18,8 @@ export type Atem = {
     setprogram: (self: Atem, input: AtemInputId) -> (),
     getprogram: (self: Atem) -> AtemInput?,
     setpreview: (self: Atem, input: AtemInputId) -> (),
-    getpreview: (self: Atem) -> AtemInput?,
+    getpreview: (self: Atem) -> AtemInputId,
+    fadetoblack: (self: Atem, on: boolean) -> (),
 
     transition: ((self: Atem) -> ())
         & (self: Atem, input: AtemInputId) -> (),

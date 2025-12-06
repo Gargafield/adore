@@ -4,6 +4,8 @@ project(adore VERSION 0.1.0 LANGUAGES C CXX)
 
 OPTION(ADORE_BLACKMAGIC "Enable blackmagic design library" ON)
 
+add_compile_definitions(LUA_VECTOR_SIZE=4)
+
 add_subdirectory(extern/lute)
 add_subdirectory(extern/raylib)
 

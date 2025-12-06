@@ -25,7 +25,7 @@ int getmousepos(lua_State* L);
 int getmousescroll(lua_State* L);
 int setfullscreen(lua_State* L);
 int isfullscreen(lua_State* L);
-
+int setstate(lua_State* L);
 
 int noop(lua_State* L);
 
@@ -41,6 +41,7 @@ static const luaL_Reg lib[] = {
     {"getmousescroll", getmousescroll},
     {"setfullscreen", setfullscreen},
     {"isfullscreen", isfullscreen},
+    {"setstate", setstate},
     {nullptr, nullptr}
 };
 

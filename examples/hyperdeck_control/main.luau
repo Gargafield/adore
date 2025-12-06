@@ -14,7 +14,9 @@ local cliplist = require("./cliplist")
 window.init(800, 600, "HyperDeck Control Example")
 window.setfps(30)
 
-local deck = hyperdeck.connect("192.168.0.95");
+local deck = hyperdeck.connect("192.168.1.19");
+
+task.wait(1)
 
 local myplaybutton = playbutton(deck, function (work: string)
     if work == "play" then
@@ -35,12 +37,12 @@ function window.draw()
     myplaybutton(0, 0, 100, 50)
     gui.label(110, 00, 200, 10, "Deck Status: " .. deck.status)
     gui.label(110, 20, 200, 10, "Timecode: " .. tostring(deck.timecode))
-    if deck.clip then
-        local playingclip = deck.clips[deck.clip]
-        local format = hyperdeck.formats[playingclip.format]
-        if format then
-            gui.label(110, 40, 300, 10, string.format("Format: %s (%dx%d @ %.2f fps)", format.name, format.width, format.height, format.framerate))
-        end
-    end
+    -- if deck.clip then
+    --     local playingclip = deck.clips[deck.clip]
+    --     local format = hyperdeck.formats[playingclip.format]
+    --     if format then
+    --         gui.label(110, 40, 300, 10, string.format("Format: %s (%dx%d @ %.2f fps)", format.name, format.width, format.height, format.framerate))
+    --     end
+    -- end
     mycliplist(0, 80, 400, 540)
 end

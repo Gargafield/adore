@@ -28,6 +28,7 @@ static const std::pair<const char*, Color> colors[] = {
     {"brown", BROWN},
     {"darkbrown", DARKBROWN},
     {"raywhite", RAYWHITE},
+    {"blank", BLANK}
 };
 
 Color check_color(lua_State* L, int index) {
@@ -37,7 +38,7 @@ Color check_color(lua_State* L, int index) {
             static_cast<unsigned char>(vec[0]),
             static_cast<unsigned char>(vec[1]),
             static_cast<unsigned char>(vec[2]),
-            255
+            static_cast<unsigned char>(vec[3]),
         };
     } else {
         luaL_error(L, "Expected a vector for color");
@@ -48,13 +49,13 @@ int from(lua_State* L) {
     if (lua_isnumber(L, 1)) {
         int num = luaL_checkinteger(L, 1);
         Color color = GetColor(num);
-        lua_pushvector(L, color.r, color.g, color.b);
+        lua_pushvector(L, color.r, color.g, color.b, color.a);
         return 1;
     } else if (lua_isstring(L, 1)) {
         const char* str = luaL_checkstring(L, 1);
         for (auto& [name, color] : colors) {
             if (strcmp(name, str) == 0) {
-                lua_pushvector(L, color.r, color.g, color.b);
+                lua_pushvector(L, color.r, color.g, color.b, color.a);
                 return 1;
             }
         }
@@ -71,7 +72,7 @@ int fade(lua_State* L) {
     if (alpha > 1.0f) alpha = 1.0f;
 
     color.a = static_cast<unsigned char>(alpha * 255.0f);
-    lua_pushvector(L, color.r, color.g, color.b);
+    lua_pushvector(L, color.r, color.g, color.b, color.a);
     return 1;
 }
 
@@ -94,7 +95,7 @@ int adoreopen_color(lua_State* L)
 
     // Colors
     for (auto& [name, color] : color::colors) {
-        lua_pushvector(L, color.r, color.g, color.b);
+        lua_pushvector(L, color.r, color.g, color.b, color.a);
         lua_setfield(L, -2, name);
     }
 

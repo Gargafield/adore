@@ -1,6 +1,29 @@
 
 local window = {}
 
+window.states = {} :: {
+    vsync_hint: number,
+    fullscreen_mode: number,
+    resizable: number,
+    undecorated: number,
+    hidden: number,
+    minimized: number,
+    maximized: number,
+    unfocused: number,
+    topmost: number,
+    always_run: number,
+    transparent: number,
+    highdpi: number,
+    mouse_passthrough: number,
+    borderless_windowed: number,
+    msaa_4x_hint: number,
+    interlaced_hint: number,
+}
+
+function window.setstate(state: number, enabled: boolean?)
+    error("Not implemented")
+end
+
 function window.init(width: number, height: number, title: string)
     error("Not implemented")
 end
