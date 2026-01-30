@@ -92,6 +92,43 @@ int isfullscreen(lua_State* L) {
     return 1;
 }
 
+int getmonitorsize(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    int monitor = GetCurrentMonitor();
+    int width = GetMonitorWidth(monitor);
+    int height = GetMonitorHeight(monitor);
+    lua_pushvector(L, static_cast<float>(width), static_cast<float>(height), 0.0f, 0.0f);    
+    return 1;
+}
+
+int setsize(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    if (lua_isvector(L, 1)) {
+        const float* size = lua_tovector(L, 1);
+        SetWindowSize(static_cast<int>(size[0]), static_cast<int>(size[1]));
+        return 0;
+    }
+    int width = luaL_checkinteger(L, 1);
+    int height = luaL_checkinteger(L, 2);
+    SetWindowSize(width, height);
+    
+    return 0;
+}
+
+int setposition(lua_State* L) {
+    WINDOW_NOT_INITIALIZED_CHECK();
+    if (lua_isvector(L, 1)) {
+        const float* size = lua_tovector(L, 1);
+        SetWindowPosition(static_cast<int>(size[0]), static_cast<int>(size[1]));
+        return 0;
+    }
+    int x = luaL_checkinteger(L, 1);
+    int y = luaL_checkinteger(L, 2);
+    SetWindowPosition(x, y);
+    
+    return 0;
+}
+
 int setstate(lua_State* L) {
     unsigned int flags = static_cast<unsigned int>(luaL_checkinteger(L, 1));
     bool enable = luaL_optboolean(L, 2, true);

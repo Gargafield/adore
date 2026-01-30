@@ -9,10 +9,12 @@ int adoreopen_input(lua_State* L);
 namespace input
 {
 
-int ispressed(lua_State* L);
+int haspressed(lua_State* L);
+int isdown(lua_State* L);
 
 static const luaL_Reg lib[] = {
-    {"ispressed", ispressed},
+    {"haspressed", haspressed},
+    {"isdown", isdown},
     {nullptr, nullptr}
 };
 

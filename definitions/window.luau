@@ -63,4 +63,15 @@ function window.getmousepos(): vector
     error("Not implemented")
 end
 
+function window.getmonitorsize(): vector
+    error("Not implemented")
+end
+
+window.setsize = (nil :: any) :: ((width: number, height: number) -> ())
+    & ((size: vector) -> ())
+
+window.setposition = (nil :: any) :: ((x: number, y: number) -> ())
+    & ((position: vector) -> ())
+
+
 return window

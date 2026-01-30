@@ -7,7 +7,12 @@ local atem = require("@adore/atem")
 local gui = require("@adore/gui")
 local task = require("@lute/task")
 
-local connector = require("./connector")
+local operations = require("./standardoperations")
+
+local devices = require("./devices")
+
+devices.connectHyperdeck("192.168.0.95")
+devices.connectAtem("192.168.0.90")
 
 local transitionHyperdeck = connector.connectHyperdeck("192.168.1.17") :: hyperdeck.HyperDeck
 local programHyperdeck = connector.connectHyperdeck("192.168.1.19") :: hyperdeck.HyperDeck

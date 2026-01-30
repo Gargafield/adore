@@ -1,8 +1,11 @@
 #include "adore/color.h"
 #include <memory>
 #include <iostream>
+#include <math.h>
 
 #include "raylib.h"
+
+#define ADORE_MAX(a,b) (( (a) > (b) ) ? (a) : (b))
 
 namespace color {
 
@@ -35,10 +38,10 @@ Color check_color(lua_State* L, int index) {
     if (lua_isvector(L, index)) {
         const float* vec = luaL_checkvector(L, index);
         return Color{
-            static_cast<unsigned char>(vec[0]),
-            static_cast<unsigned char>(vec[1]),
-            static_cast<unsigned char>(vec[2]),
-            static_cast<unsigned char>(vec[3]),
+            static_cast<unsigned char>(ADORE_MAX(vec[0], 0.0f)),
+            static_cast<unsigned char>(ADORE_MAX(vec[1], 0.0f)),
+            static_cast<unsigned char>(ADORE_MAX(vec[2], 0.0f)),
+            static_cast<unsigned char>(ADORE_MAX(vec[3], 0.0f)),
         };
     } else {
         luaL_error(L, "Expected a vector for color");
@@ -64,6 +67,23 @@ int from(lua_State* L) {
 
     return 0;
 }
+
+int rgb(lua_State* L) {
+    if (lua_gettop(L) == 1) {
+        int gray = luaL_checkinteger(L, 1);
+        lua_pushvector(L, gray, gray, gray, 255);
+        return 1;
+    }
+
+    int r = luaL_checkinteger(L, 1);
+    int g = luaL_checkinteger(L, 2);
+    int b = luaL_checkinteger(L, 3);
+    int a = luaL_optinteger(L, 4, 255);
+    lua_pushvector(L, r, g, b, a);
+
+    return 1;
+}
+
 
 int fade(lua_State* L) {
     Color color = check_color(L, 1);
