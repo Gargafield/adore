@@ -6,6 +6,7 @@
 #include "lute/uvstate.h"
 #include "lute/runtime.h"
 #include "lute/climain.h"
+#include "lute/requiresetup.h"
 #include "lute/require.h"
 #include "Luau/Common.h"
 #include "Luau/Require.h"
