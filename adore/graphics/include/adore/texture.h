@@ -12,10 +12,15 @@ constexpr int kTextureUserdataTag = 100;
 namespace texture
 {
 
+struct TextureRef {
+    Texture2D texture;
+    bool owned;
+};
+
 int load_texture_from_path(lua_State* L);
 int load_texture_from_image(lua_State* L);
-Texture2D* check_texture(lua_State* L, int index);
-int create_texture_userdata(lua_State* L, const Texture2D& texture);
+TextureRef* check_texture(lua_State* L, int index);
+int create_texture_userdata(lua_State* L, const Texture2D& texture, bool owned = true);
 int index(lua_State* L);
 int draw_texture(lua_State* L);
 int set_filter(lua_State* L);

@@ -29,7 +29,7 @@ int load_texture_from_path(lua_State* L) {
         luaL_error(L, "Failed to load texture: %s", path);
     }
 
-    return create_texture_userdata(L, texture);
+    return create_texture_userdata(L, texture, true);
 }
 
 int load_texture_from_image(lua_State* L) {
@@ -42,35 +42,35 @@ int load_texture_from_image(lua_State* L) {
         luaL_error(L, "Failed to load texture from image");
     }
 
-    return create_texture_userdata(L, texture);
+    return create_texture_userdata(L, texture, true);
 }
 
-Texture2D* check_texture(lua_State* L, int index) {
+TextureRef* check_texture(lua_State* L, int index) {
     void* ud = lua_touserdatatagged(L, index, kTextureUserdataTag);
     if (!ud) {
         luaL_typeerror(L, index, "Texture");
     }
-    return static_cast<Texture2D*>(ud);
+    return static_cast<TextureRef*>(ud);
 }
 
 int index(lua_State* L) {
-    Texture2D* texture = check_texture(L, 1);
+    TextureRef* textureRef = check_texture(L, 1);
     const char* key = luaL_checkstring(L, 2);
 
     if (strcmp(key, "width") == 0) {
-        lua_pushinteger(L, texture->width);
+        lua_pushinteger(L, textureRef->texture.width);
         return 1;
     } else if (strcmp(key, "height") == 0) {
-        lua_pushinteger(L, texture->height);
+        lua_pushinteger(L, textureRef->texture.height);
         return 1;
     } else if (strcmp(key, "id") == 0) {
-        lua_pushinteger(L, texture->id);
+        lua_pushinteger(L, textureRef->texture.id);
         return 1;
     } else if (strcmp(key, "mipmaps") == 0) {
-        lua_pushinteger(L, texture->mipmaps);
+        lua_pushinteger(L, textureRef->texture.mipmaps);
         return 1;
     } else if (strcmp(key, "format") == 0) {
-        lua_pushinteger(L, texture->format);
+        lua_pushinteger(L, textureRef->texture.format);
         return 1;
     }
 
@@ -84,13 +84,13 @@ int draw_texture(lua_State* L) {
         luaL_error(L, "Expected at least 3 arguments (texture, x, y, [, rotation, scale, tint])");
     }
 
-    Texture2D* texture = check_texture(L, 1);
+    TextureRef* textureRef = check_texture(L, 1);
     int x = luaL_checkinteger(L, 2);
     int y = luaL_checkinteger(L, 3);
 
     if (numargs == 4) {
         Color tint = color::check_color(L, 4);
-        DrawTexture(*texture, x, y, tint);
+        DrawTexture(textureRef->texture, x, y, tint);
         return 0;
     } else if (numargs == 6) {
         float rotation = static_cast<float>(luaL_checknumber(L, 4));
@@ -98,7 +98,7 @@ int draw_texture(lua_State* L) {
         Color tint = color::check_color(L, 6);
 
         Vector2 position = { static_cast<float>(x), static_cast<float>(y) };
-        DrawTextureEx(*texture, position, rotation, scale, tint);
+        DrawTextureEx(textureRef->texture, position, rotation, scale, tint);
         return 0;
     } else {
         luaL_error(L, "Invalid number of arguments to draw texture");
@@ -108,10 +108,10 @@ int draw_texture(lua_State* L) {
 }
 
 int set_filter(lua_State* L) {
-    Texture2D* texture = check_texture(L, 1);
+    TextureRef* textureRef = check_texture(L, 1);
     int filter = luaL_checkinteger(L, 2);
 
-    SetTextureFilter(*texture, filter);
+    SetTextureFilter(textureRef->texture, filter);
 
     return 0;
 }
@@ -142,8 +142,10 @@ int adoreregister_texture(lua_State* L)
     lua_setuserdatadtor(L, kTextureUserdataTag,
         [](lua_State* L, void* ud)
         {
-            Texture2D* texture = static_cast<Texture2D*>(ud);
-            // UnloadTexture(*texture); // We'll need a better form of resource management later
+            texture::TextureRef* textureRef = static_cast<texture::TextureRef*>(ud);
+            if (textureRef->owned) {
+                UnloadTexture(textureRef->texture);
+            }
         }
     );
 

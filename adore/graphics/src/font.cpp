@@ -46,7 +46,7 @@ int index(lua_State* L) {
     const char* key = luaL_checkstring(L, 2);
 
     if (strcmp(key, "texture") == 0) {
-        return texture::create_texture_userdata(L, font->texture);
+        return texture::create_texture_userdata(L, font->texture, false /* owned */);
     }
 
     luaL_error(L, "Attempt to access invalid Texture property: %s", key);
