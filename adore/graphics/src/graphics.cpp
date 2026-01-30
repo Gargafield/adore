@@ -1,6 +1,6 @@
 #include "adore/graphics.h"
 
-#include "adore/color.h"
+#include "adore/colors.h"
 #include "adore/rect.h"
 #include <memory>
 #include "raylib.h"

@@ -1,4 +1,4 @@
-#include "adore/color.h"
+#include "adore/colors.h"
 #include <memory>
 #include <iostream>
 #include <math.h>
@@ -99,7 +99,7 @@ int fade(lua_State* L) {
 } // namespace color
 
 
-int adoreopen_color(lua_State* L)
+int adoreopen_colors(lua_State* L)
 {
     lua_createtable(L, 0, std::size(color::lib) + std::size(color::colors));
     

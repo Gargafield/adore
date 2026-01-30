@@ -1,7 +1,7 @@
 #include "adore/font.h"
 
 #include "adore/window.h"
-#include "adore/color.h"
+#include "adore/colors.h"
 #include "adore/texture.h"
 #include <memory>
 #include <iostream>

@@ -1,7 +1,7 @@
 
 local window = require("@adore/window")
 local graphics = require("@adore/graphics")
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 local Aquarium = require("./aquarium")
 local Fish = require("./fish")
 
@@ -19,7 +19,7 @@ function window.update(dt: number)
 end
 
 function window.draw()
-    graphics.clearscreen(color.white)
+    graphics.clearscreen(colors.white)
 
     myAquarium:display()
 end

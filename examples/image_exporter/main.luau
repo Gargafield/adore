@@ -11,7 +11,7 @@
 
 local window = require("@adore/window")
 local graphics = require("@adore/graphics")
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 local gui = require("@adore/gui")
 local task = require("@lute/task")
 
@@ -47,12 +47,14 @@ function window.update(dt)
             image = graphics.image.load(files[1])
             if image then
                 texture = graphics.texture.fromimage(image) :: graphics.Texture
-
-                imageScale =
-                    if texture.height > SCREEN_HEIGHT then
-                        (SCREEN_HEIGHT - 100) / texture.height
-                    else
-                        (SCREEN_WIDTH - 100) / texture.width;
+                
+                if texture ~= nil then
+                    imageScale =
+                        if texture.height > SCREEN_HEIGHT then
+                            (SCREEN_HEIGHT - 100) / texture.height
+                        else
+                            (SCREEN_WIDTH - 100) / texture.width;
+                end
             else
                 print("Failed to load image!")
             end
@@ -109,7 +111,7 @@ function aabb(box: { number }, point: vector)
 end
 
 function window.draw()
-    graphics.clearscreen(color.raywhite)
+    graphics.clearscreen(colors.raywhite)
     if texture then
         graphics.texture.draw(
             texture,
@@ -117,13 +119,13 @@ function window.draw()
             SCREEN_HEIGHT / 2 - (texture.height * imageScale) / 2,
             0,
             imageScale,
-            color.white
+            colors.white
         )
 
-        graphics.rectangle("line", imageBox, if aabb(imageBox, window.getmousepos()) then color.red else color.darkgray)
-        graphics.print(`SCALE: {math.round(imageScale * 100)}%`, 20, SCREEN_HEIGHT - 40, 20, color.darkgray)
+        graphics.rectangle("line", imageBox, if aabb(imageBox, window.getmousepos()) then colors.red else colors.darkgray)
+        graphics.print(`SCALE: {math.round(imageScale * 100)}%`, 20, SCREEN_HEIGHT - 40, 20, colors.darkgray)
     else
-        graphics.print("DRAG & DROP YOUR IMAGE!", 350, 200, 10, color.darkgray)
+        graphics.print("DRAG & DROP YOUR IMAGE!", 350, 200, 10, colors.darkgray)
         gui.disable()
     end
 
@@ -133,8 +135,8 @@ function window.draw()
     gui.enable()
 
     if windowBoxActive then
-        graphics.rectangle("fill", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color.fade(color.raywhite, 0.7))
-        windowBoxActive = gui.windowbox(windowBox, "Image Export Options") == 0
+        graphics.rectangle("fill", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors.fade(colors.raywhite, 0.7))
+        windowBoxActive = gui.windowbox(windowBox, "Image Export Options")
         gui.label(windowBox[1] + 10, windowBox[2] + 35, 60, 25, "File Format:")
         fileFormat = gui.combobox(windowBox[1] + 80, windowBox[2] + 35, 130, 25, fileFormats, fileFormat)
         gui.label(windowBox[1] + 10, windowBox[2] + 70, 60, 25, "Pixel Format:")

@@ -14,7 +14,7 @@
 #include "Luau/Compiler.h"
 #include "adore/window.h"
 #include "adore/graphics.h"
-#include "adore/color.h"
+#include "adore/colors.h"
 #include "adore/input.h"
 #include "adore/gui.h"
 #ifdef ADORE_BLACKMAGIC
@@ -256,7 +256,7 @@ void setupLuaState(lua_State* L) {
 	std::vector<std::pair<const char*, lua_CFunction>> libs = {{
         {"@adore/window", adoreopen_window},
         {"@adore/graphics", adoreopen_graphics},
-        {"@adore/color", adoreopen_color},
+        {"@adore/colors", adoreopen_colors},
         {"@adore/gui", adoreopen_gui},
         {"@adore/input", adoreopen_input},
 #ifdef ADORE_BLACKMAGIC

@@ -1,5 +1,5 @@
 
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 
 local graphics = {}
 
@@ -36,8 +36,8 @@ export type ImageFormat =
 graphics.texture = {} :: {
     load: (path: string) -> Texture,
     fromimage: (image: Image) -> Texture,
-    draw: ((self: Texture, x: number, y: number, tint: color.Color?) -> ())
-        & (self: Texture, x: number, y: number, rotation: number, scale: number, tint: color.Color?) -> (),
+    draw: ((self: Texture, x: number, y: number, tint: colors.Color?) -> ())
+        & (self: Texture, x: number, y: number, rotation: number, scale: number, tint: colors.Color?) -> (),
     setfilter: (self: Texture, filter: TextureFilter) -> (),
     filter: {
         point: TextureFilter,
@@ -61,25 +61,25 @@ type Font = {
 
 graphics.font = {} :: {
     load: (path: string) -> Font,
-    draw: (font: Font, x: number, y: number, size: number, text: string, color: color.Color, spacing: number?) -> (),
+    draw: (font: Font, x: number, y: number, size: number, text: string, color: colors.Color, spacing: number?) -> (),
     measure: (font: Font, size: number, text: string, spacing: number?) -> vector,
     getdefault: () -> Font,
 }
 
-function graphics.clearscreen(color: color.Color)
+function graphics.clearscreen(color: colors.Color)
     error("Not implemented")
 end
-function graphics.print(text: string, x: number, y: number, fontsize: number, color: color.Color)
+function graphics.print(text: string, x: number, y: number, fontsize: number, color: colors.Color)
     error("Not implemented")
 end
-function graphics.circle(mode: string, x: number, y: number, radius: number, color: color.Color)
+function graphics.circle(mode: string, x: number, y: number, radius: number, color: colors.Color)
     error("Not implemented")
 end
 
 type RectangleDrawMode = "fill" | "line"
 
 graphics.rectangle = (nil :: any)
-    :: ((mode: RectangleDrawMode, x: number, y: number, width: number, height: number, color: color.Color) -> ())
-    & ((mode: RectangleDrawMode, box: { number }, color: color.Color) -> ())
+    :: ((mode: RectangleDrawMode, x: number, y: number, width: number, height: number, color: colors.Color) -> ())
+    & ((mode: RectangleDrawMode, box: { number }, color: colors.Color) -> ())
 
 return graphics

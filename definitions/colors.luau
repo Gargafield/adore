@@ -1,7 +1,7 @@
 
 export type Color = vector;
 
-local color = {
+local colors = {
     white = vector.create(0, 0, 0),
     black = vector.create(0, 0, 0),
     red = vector.create(0, 0, 0),
@@ -26,16 +26,16 @@ local color = {
     blank = vector.create(0, 0, 0),
 }
 
-function color.from(arg: number | string): Color
+function colors.from(arg: number | string): Color
     error("Not implemented")
 end
 
-function color.fade(col: Color, alpha: number): Color
+function colors.fade(col: Color, alpha: number): Color
     error("Not implemented")
 end
 
-function color.rgb(r: number, g: number, b: number, a: number?): Color
+function colors.rgb(r: number, g: number, b: number, a: number?): Color
     error("Not implemented")
 end
 
-return color
+return colors

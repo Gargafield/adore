@@ -1,16 +1,16 @@
 
 local graphics = require("@adore/graphics")
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 
 local Fish = {}
 Fish.__index = Fish
 
-function Fish.new(x: number?, y: number?, _color: color.Color?)
+function Fish.new(x: number?, y: number?, color: colors.Color?)
     local self = setmetatable({}, Fish)
 
     self.position = vector.create(x or 0, y or 0)
     self.velocity = vector.create(0, 0)
-    self.color = _color
+    self.color = color
         or (vector.create :: any)(
             math.random(0, 255),
             math.random(0, 255),

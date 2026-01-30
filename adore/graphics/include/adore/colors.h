@@ -6,7 +6,7 @@
 #include "raylib.h"
 
 // open the library as a table on top of the stack
-int adoreopen_color(lua_State* L);
+int adoreopen_colors(lua_State* L);
 
 namespace color
 {

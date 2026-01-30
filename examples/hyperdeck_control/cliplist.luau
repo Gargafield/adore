@@ -2,7 +2,7 @@
 local hyperdeck = require("@adore/hyperdeck")
 local gui = require("@adore/gui")
 local graphics = require("@adore/graphics")
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 local timecode = require("@adore/timecode")
 
 return function (deck: hyperdeck.HyperDeck)
@@ -20,9 +20,9 @@ return function (deck: hyperdeck.HyperDeck)
             local thisplaying = (playingclipid ~= nil and timelineClip.id == playingclipid)
             local text = string.format("%03d - %s (%s)", timelineClip.id, diskClip.name, diskClip.duration)
             if thisplaying then
-                gui.setstyle("label", "text", "normal", color.green)
+                gui.setstyle("label", "text", "normal", colors.green)
             else
-                gui.setstyle("label", "text", "normal", color.black)
+                gui.setstyle("label", "text", "normal", colors.black)
             end
             gui.title(ix, iy, iw, 30, text)
 
@@ -37,7 +37,7 @@ return function (deck: hyperdeck.HyperDeck)
                 deck:goto("position", scrub)
             end
             
-            graphics.rectangle("line", ix, iy, iw, 30, color.darkgray)
+            graphics.rectangle("line", ix, iy, iw, 30, colors.darkgray)
 
             return 30 -- item height
         end)

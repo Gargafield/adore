@@ -3,14 +3,14 @@ add_library(Adore.Graphics STATIC)
 
 target_sources(Adore.Graphics PRIVATE
     include/adore/graphics.h
-    include/adore/color.h
+    include/adore/colors.h
     include/adore/texture.h
     include/adore/image.h
     include/adore/rect.h
     include/adore/font.h
 
     src/graphics.cpp
-    src/color.cpp
+    src/colors.cpp
     src/texture.cpp
     src/image.cpp
     src/rect.cpp

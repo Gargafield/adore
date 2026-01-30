@@ -3,7 +3,7 @@
 local hyperdeck = require("@adore/hyperdeck")
 local window = require("@adore/window")
 local graphics = require("@adore/graphics")
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 local gui = require("@adore/gui")
 local task = require("@lute/task")
 local timecode = require("@adore/timecode")
@@ -33,7 +33,7 @@ function window.update(dt)
 end
 
 function window.draw()
-    graphics.clearscreen(color.raywhite)
+    graphics.clearscreen(colors.raywhite)
     myplaybutton(0, 0, 100, 50)
     gui.label(110, 00, 200, 10, "Deck Status: " .. deck.status)
     gui.label(110, 20, 200, 10, "Timecode: " .. tostring(deck.timecode))

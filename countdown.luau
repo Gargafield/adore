@@ -4,7 +4,7 @@ local graphics = require("@adore/graphics")
 local task = require("@lute/task")
 local window = require("@adore/window")
 local time = require("@lute/time")
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 local input = require("@adore/input")
 
 local SCREEN_WIDTH = 1920

@@ -8,7 +8,7 @@ export type AtemInput = {
     type: string,
 }
 
-type AtemInputId = AtemInput | number
+type AtemInputId = AtemInput
 
 export type Atem = {
     name: string,
@@ -18,7 +18,7 @@ export type Atem = {
     setprogram: (self: Atem, input: AtemInputId) -> (),
     getprogram: (self: Atem) -> AtemInput?,
     setpreview: (self: Atem, input: AtemInputId) -> (),
-    getpreview: (self: Atem) -> AtemInputId,
+    getpreview: (self: Atem) -> AtemInput?,
     fadetoblack: (self: Atem, on: boolean) -> (),
 
     transition: ((self: Atem) -> ())

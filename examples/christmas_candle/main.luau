@@ -1,7 +1,7 @@
 
 local window = require("@adore/window")
 local graphics = require("@adore/graphics")
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 
 window.setstate(bit32.bor(
     window.states.topmost,
@@ -23,7 +23,7 @@ type Particle = {
     position: vector,
     velocity: vector,
     size: number,
-    color: color.Color,
+    color: colors.Color,
     lifetime: number,
 }
 local particles = {} :: {Particle}
@@ -50,8 +50,8 @@ end
 local time_left = time_to_christmas()
 local time_since_calibration = 0.0
 
-local SMOKE_DELTA_COLOR = color.rgb(-1, -1, -1, 3)
-local FIRE_DELTA_COLOR = color.rgb(0, 6, 0, 3)
+local SMOKE_DELTA_COLOR = colors.rgb(-1, -1, -1, 3)
+local FIRE_DELTA_COLOR = colors.rgb(0, 6, 0, 3)
 
 function window.update(dt: number)
     if time_since_calibration >= 10.0 then
@@ -86,8 +86,8 @@ function window.update(dt: number)
                 if is_past_christmas then -0.1 else -0.20),
             size = math.random(5, 10),
             color = if 
-                is_past_christmas then color.rgb(50, 50, 50)
-                else color.rgb(255, math.random(180, 200), 0),
+                is_past_christmas then colors.rgb(50, 50, 50)
+                else colors.rgb(255, math.random(180, 200), 0),
             lifetime = math.random(30, 60) / 30,
         }
         table.insert(particles, newParticle)
@@ -95,7 +95,7 @@ function window.update(dt: number)
 end
 
 function window.draw()
-    graphics.clearscreen(color.blank)
+    graphics.clearscreen(colors.blank)
 
     -- draw candle base
     local candle_y = get_candle_y(time_left)
@@ -105,7 +105,7 @@ function window.draw()
         candle_y,
         30,
         SCREEN_HEIGHT - candle_y,
-        color.white
+        colors.white
     )
 
     graphics.rectangle(
@@ -114,7 +114,7 @@ function window.draw()
         candle_y - 10,
         4,
         13,
-        color.black
+        colors.black
     )
 
     graphics.rectangle(
@@ -123,7 +123,7 @@ function window.draw()
         SCREEN_HEIGHT - 40,
         120,
         40,
-        color.maroon
+        colors.maroon
     )
 
     -- day markings
@@ -136,14 +136,14 @@ function window.draw()
             y,
             15,
             3,
-            color.black
+            colors.black
         )
         graphics.print(
             tostring(day),
             SCREEN_WIDTH / 2 + 5,
             y - 3,
             5,
-            color.black
+            colors.black
         )
     end
 

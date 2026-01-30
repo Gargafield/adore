@@ -1,6 +1,6 @@
 
 local graphics = require("@adore/graphics")
-local color = require("@adore/color")
+local colors = require("@adore/colors")
 local Fish = require("./fish")
 
 local Aquarium = {}
@@ -22,13 +22,13 @@ end
 export type Aquarium = typeof(Aquarium.new(0, 0))
 
 function Aquarium.display(self: Aquarium)
-    graphics.rectangle("line", self.x, self.y, self.width, self.height, color.black)
+    graphics.rectangle("line", self.x, self.y, self.width, self.height, colors.black)
     
     local bottomY = self.y + self.height
     local sandHeight = self.height * 0.2
     local sandY = bottomY - sandHeight
     
-    graphics.rectangle("fill", self.x + 1, sandY, self.width - 2, sandHeight - 1, color.yellow)
+    graphics.rectangle("fill", self.x + 1, sandY, self.width - 2, sandHeight - 1, colors.yellow)
 
     for _, _fish in self.fish do
         _fish:display(self.x, self.y)
