@@ -1,5 +1,6 @@
 #include "adore/texture.h"
 
+#include "adore/core.h"
 #include "adore/window.h"
 #include "adore/colors.h"
 #include "adore/image.h"
@@ -9,9 +10,10 @@
 
 namespace texture {
 
-int create_texture_userdata(lua_State* L, const Texture2D& texture) {
-    Texture2D* texPtr = static_cast<Texture2D*>(lua_newuserdatatagged(L, sizeof(Texture2D), kTextureUserdataTag));
-    *texPtr = texture;
+int create_texture_userdata(lua_State* L, const Texture2D& texture, bool owned) {
+    TextureRef* texPtr = static_cast<TextureRef*>(lua_newuserdatatagged(L, sizeof(TextureRef), kTextureUserdataTag));
+    texPtr->texture = texture;
+    texPtr->owned = owned;
 
     lua_getuserdatametatable(L, kTextureUserdataTag);
     lua_setmetatable(L, -2);
@@ -85,24 +87,100 @@ int draw_texture(lua_State* L) {
     }
 
     TextureRef* textureRef = check_texture(L, 1);
+    Color color = WHITE;
+    if (numargs == 4) {
+        color = color::check_color(L, 4);
+    } else if (numargs == 6) {
+        Color tint = color::check_color(L, 6);
+    } else if (numargs != 3) {
+        luaL_error(L, "Invalid number of arguments to draw texture");
+    }
+
+    if (lua_istable(L, 2) && lua_istable(L, 3)) {
+        // Draw with source and destination rectangles
+        Rectangle sourceRect;
+        Rectangle destRect;
+
+        // Source rectangle
+        lua_rawgeti(L, 2, 1);
+        sourceRect.x = static_cast<float>(luaL_checknumber(L, -1));
+        lua_pop(L, 1);
+        lua_rawgeti(L, 2, 2);
+        sourceRect.y = static_cast<float>(luaL_checknumber(L, -1));
+        lua_pop(L, 1);
+        lua_rawgeti(L, 2, 3);
+        sourceRect.width = static_cast<float>(luaL_checknumber(L, -1));
+        lua_pop(L, 1);
+        lua_rawgeti(L, 2, 4);
+        sourceRect.height = static_cast<float>(luaL_checknumber(L, -1));
+        lua_pop(L, 1);
+
+        // Destination rectangle
+        lua_rawgeti(L, 3, 1);
+        destRect.x = static_cast<float>(luaL_checknumber(L, -1));
+        lua_pop(L, 1);
+        lua_rawgeti(L, 3, 2);
+        destRect.y = static_cast<float>(luaL_checknumber(L, -1));
+        lua_pop(L, 1);
+        lua_rawgeti(L, 3, 3);
+        destRect.width = static_cast<float>(luaL_checknumber(L, -1));
+        lua_pop(L, 1);
+        lua_rawgeti(L, 3, 4);
+        destRect.height = static_cast<float>(luaL_checknumber(L, -1));
+        lua_pop(L, 1);
+
+        DrawTexturePro(textureRef->texture, sourceRect, destRect, {0, 0}, 0, color);
+        return 0;
+    }
+
     int x = luaL_checkinteger(L, 2);
     int y = luaL_checkinteger(L, 3);
 
-    if (numargs == 4) {
-        Color tint = color::check_color(L, 4);
-        DrawTexture(textureRef->texture, x, y, tint);
-        return 0;
-    } else if (numargs == 6) {
+    if (numargs == 6) {
         float rotation = static_cast<float>(luaL_checknumber(L, 4));
         float scale = static_cast<float>(luaL_checknumber(L, 5));
-        Color tint = color::check_color(L, 6);
 
         Vector2 position = { static_cast<float>(x), static_cast<float>(y) };
-        DrawTextureEx(textureRef->texture, position, rotation, scale, tint);
+        DrawTextureEx(textureRef->texture, position, rotation, scale, color);
         return 0;
     } else {
-        luaL_error(L, "Invalid number of arguments to draw texture");
+        DrawTexture(textureRef->texture, x, y, color);
     }
+
+    return 0;
+}
+
+int draw_texture_flipped(lua_State* L) {
+    int numargs = lua_gettop(L);
+    if (numargs < 4) {
+        luaL_error(L, "Expected at least 4 arguments (texture, x, y, axis)");
+    }
+
+    TextureRef* textureRef = check_texture(L, 1);
+    int x = luaL_checkinteger(L, 2);
+    int y = luaL_checkinteger(L, 3);
+    const char* axis = luaL_checkstring(L, 4);
+
+    Rectangle srcRect = {
+        0, 0, textureRef->texture.width, textureRef->texture.height
+    };
+
+    if (strcmp(axis, "x") == 0) {
+        srcRect.width = -srcRect.width;
+    } else if (strcmp(axis, "y") == 0) {
+        srcRect.height = -srcRect.height;
+    } else if (strcmp(axis, "xy") == 0) {
+        srcRect.width = -srcRect.width;
+        srcRect.height = -srcRect.height;
+    } else {
+        luaL_error(L, "Invalid axis value for drawflipped. Expected 'x', 'y', or 'xy'.");
+    }
+
+    DrawTextureRec(textureRef->texture, 
+        srcRect,
+        { static_cast<float>(x), static_cast<float>(y) },
+        WHITE
+    );
 
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "adore/hyperdeck.h"
 
+#include "adore/core.h"
 #include "lute/runtime.h"
 #include <iostream>
 

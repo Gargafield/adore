@@ -55,7 +55,7 @@ int print(lua_State* L) {
     return 0;
 }
 
-int clearscreen(lua_State* L) {
+int clear(lua_State* L) {
     Color color = color::check_color(L, 1);
 
     ClearBackground(color);
@@ -64,40 +64,15 @@ int clearscreen(lua_State* L) {
 }
 
 int drawtexture(lua_State* L) {
-    Texture2D* texture = texture::check_texture(L, 1);
+    texture::TextureRef* textureRef = texture::check_texture(L, 1);
     int x = luaL_checkinteger(L, 2);
     int y = luaL_checkinteger(L, 3);
     Color tint = color::check_color(L, 4);
 
-    DrawTexture(*texture, x, y, tint);
+    DrawTexture(textureRef->texture, x, y, tint);
 
     return 0;
 }
-
-static const std::pair<const char*, Color> colors[] = {
-    {"white", WHITE},
-    {"black", BLACK},
-    {"red", RED},
-    {"green", GREEN},
-    {"blue", BLUE},
-    {"yellow", YELLOW},
-    {"orange", ORANGE},
-    {"pink", PINK},
-    {"purple", PURPLE},
-    {"maroon", MAROON},
-    {"lime", LIME},
-    {"skyblue", SKYBLUE},
-    {"violet", VIOLET},
-    {"darkgray", DARKGRAY},
-    {"gray", GRAY},
-    {"lightgray", LIGHTGRAY},
-    {"darkblue", DARKBLUE},
-    {"darkgreen", DARKGREEN},
-    {"brown", BROWN},
-    {"darkbrown", DARKBROWN},
-    {"raywhite", RAYWHITE},
-};
-
 
 } // namespace graphics
 

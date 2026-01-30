@@ -9,6 +9,7 @@ add_compile_definitions(LUA_VECTOR_SIZE=4)
 add_subdirectory(extern/lute)
 add_subdirectory(extern/raylib)
 
+add_subdirectory(adore/core)
 add_subdirectory(adore/window)
 add_subdirectory(adore/graphics)
 add_subdirectory(adore/gui)

@@ -37,7 +37,9 @@ graphics.texture = {} :: {
     load: (path: string) -> Texture,
     fromimage: (image: Image) -> Texture,
     draw: ((self: Texture, x: number, y: number, tint: colors.Color?) -> ())
-        & (self: Texture, x: number, y: number, rotation: number, scale: number, tint: colors.Color?) -> (),
+        & ((self: Texture, x: number, y: number, rotation: number, scale: number, tint: colors.Color?) -> ())
+        & ((self: Texture, sourceRect: { number }, destRect: { number }, tint: colors.Color?) -> ()),
+    drawflipped: (self: Texture, x: number, y: number, flippedAxis: "x" | "y" | "xy") -> (),
     setfilter: (self: Texture, filter: TextureFilter) -> (),
     filter: {
         point: TextureFilter,
@@ -66,7 +68,18 @@ graphics.font = {} :: {
     getdefault: () -> Font,
 }
 
-function graphics.clearscreen(color: colors.Color)
+type RenderTexture = {
+    texture: Texture,
+    depth: Texture
+}
+
+graphics.rendertexture = {} :: {
+    create: (width: number, height: number) -> RenderTexture,
+    start: (RenderTexture) -> (),
+    stop: () -> ()
+}
+
+function graphics.clear(color: colors.Color)
     error("Not implemented")
 end
 function graphics.print(text: string, x: number, y: number, fontsize: number, color: colors.Color)

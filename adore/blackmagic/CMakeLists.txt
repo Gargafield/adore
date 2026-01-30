@@ -17,7 +17,7 @@ set_target_properties(Adore.Blackmagic PROPERTIES OUTPUT_NAME adore)
 target_include_directories(Adore.Blackmagic PUBLIC "include")
 target_include_directories(Adore.Blackmagic PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../extern/lute/extern/uSockets/src/")
 target_compile_features(Adore.Blackmagic PUBLIC cxx_std_17)
-target_link_libraries(Adore.Blackmagic PRIVATE Luau.VM Lute.Runtime uSockets uv_a)
+target_link_libraries(Adore.Blackmagic PRIVATE Adore.Core Luau.VM Lute.Runtime uSockets uv_a)
 target_compile_options(Adore.Blackmagic PRIVATE ${LUTE_OPTIONS})
 
 IF (WIN32)

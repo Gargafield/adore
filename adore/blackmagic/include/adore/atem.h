@@ -8,7 +8,6 @@
 // open the library as a table on top of the stack
 int adoreopen_atem(lua_State* L);
 
-constexpr int kAtemUserdataTag = 96;
 
 namespace atem
 {

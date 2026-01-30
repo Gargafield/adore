@@ -1,5 +1,6 @@
 #include "adore/image.h"
 
+#include "adore/core.h"
 #include "adore/window.h"
 #include <memory>
 #include <iostream>

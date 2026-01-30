@@ -7,8 +7,6 @@
 
 int adoreregister_image(lua_State* L);
 
-constexpr int kImageUserdataTag = 99;
-
 namespace image
 {
 

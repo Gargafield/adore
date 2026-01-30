@@ -7,8 +7,6 @@
 
 int adoreregister_font(lua_State* L);
 
-constexpr int kFontUserdataTag = 95;
-
 namespace font
 {
 

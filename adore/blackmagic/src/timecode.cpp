@@ -1,5 +1,7 @@
 #include "adore/timecode.h"
 
+#include "adore/core.h"
+
 namespace timecode {
 
 Timecode Timecode::addFrames(int frameCount) const {

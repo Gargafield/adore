@@ -10,7 +10,6 @@
 // open the library as a table on top of the stack
 int adoreopen_hyperdeck(lua_State* L);
 
-constexpr int kHyperdeckDeviceUserdataTag = 98;
 
 namespace hyperdeck
 {

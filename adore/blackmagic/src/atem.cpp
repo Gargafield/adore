@@ -1,5 +1,6 @@
 #include "adore/atem.h"
 
+#include "adore/core.h"
 #include "BMDSwitcherAPI.tlh"
 #include <wrl/client.h>
 #include <vector>

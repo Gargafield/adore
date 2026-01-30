@@ -8,8 +8,6 @@
 // open the library as a table on top of the stack
 int adoreopen_timecode(lua_State* L);
 
-constexpr int kTimecodeUserdataTag = 97;
-
 namespace timecode
 {
 
